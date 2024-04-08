@@ -1,50 +1,44 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/coltonmosier/api-v1/internal/middleware"
+    "github.com/coltonmosier/api-v1/internal/handlers"
 )
+
+var DB *sql.DB
 
 func main() {
 	fmt.Println("This is the api server")
 
-	s := &http.Server{
-		Addr:         ":8081",
-		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
+    handlers := handlers.Handler{}
 
-	r := mux.NewRouter()
-	r.Use(loggingMiddleware)
+	r := http.NewServeMux()
 
-	r.HandleFunc("/api/v1/health", HealthHandler).Methods("GET")
-
+	r.HandleFunc("GET /api/v1/health", HealthHandler)
+    r.HandleFunc("GET /api/v1/device_type", handlers.GetDeviceType)
+    r.HandleFunc("POST /api/v1/device_type/{name}", handlers.CreateDeviceType)
 
 	http.Handle("/", r)
 
+	s := &http.Server{
+		Addr:         ":8081",
+		Handler:      middleware.LoggingMiddleware(r),
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
 	log.Fatal(s.ListenAndServe())
 }
 
-// This function should be logging to a database and also to a file
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.Header.Get("X-Real-IP")
-		msg := fmt.Sprintf("%s %s %s %s\n", ip, r.Method, r.RequestURI, r.UserAgent())
-		log.Print(msg)
-
-		next.ServeHTTP(w, r)
-	})
-}
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-    w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
-
