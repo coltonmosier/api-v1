@@ -3,27 +3,41 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+    "github.com/coltonmosier/api-v1/internal/database"
+	"github.com/coltonmosier/api-v1/internal/handlers"
 	"github.com/coltonmosier/api-v1/internal/middleware"
-    "github.com/coltonmosier/api-v1/internal/handlers"
+	"github.com/joho/godotenv"
 )
 
-var DB *sql.DB
+var ( 
+    EqDB *sql.DB
+    LogDB *sql.DB
+)
 
 func main() {
-	fmt.Println("This is the api server")
+    err := godotenv.Load(".env")
+    if err != nil {
+        log.Fatal("Error loading .env file", err)
+    }
 
-    handlers := handlers.Handler{}
+    EqDB = database.InitEquipmentDatabase()
+    LogDB = database.InitLoggingDatabase()
+
+    devices := handlers.DeviceHandler{}
 
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
-    r.HandleFunc("GET /api/v1/device_type", handlers.GetDeviceType)
-    r.HandleFunc("POST /api/v1/device_type/{name}", handlers.CreateDeviceType)
+    // NOTE: Device Type routes
+    r.HandleFunc("GET /api/v1/device_type", devices.GetDeviceType)
+    r.HandleFunc("POST /api/v1/device_type/{name}", devices.CreateDeviceType)
+    // NOTE: Manufacturer routes
+
+    // NOTE: Equipment routes
 
 	http.Handle("/", r)
 

@@ -8,34 +8,40 @@ import (
 	"github.com/coltonmosier/api-v1/internal/models"
 )
 
-type Handler struct{}
+type DeviceHandler struct{}
 
 var devices = []models.DeviceType{
 	{
-        ID: 1, 
-        Name: "apple", 
-        Status: "active",
-    },
+		ID:     1,
+		Name:   "apple",
+		Status: "active",
+	},
 	{
-        ID: 2, 
-        Name: "samsung", 
-        Status: "active",
-    },
+		ID:     2,
+		Name:   "samsung",
+		Status: "active",
+	},
 }
 
-func (h *Handler) GetDeviceType(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-    // I want to return the devices slice as a JSON response
-    output, err := json.Marshal(devices)
-    if err != nil {
-        log.Println("Error marshalling devices")
-        return
-    }
-    w.Write([]byte(output))
+func (h *DeviceHandler) GetDeviceType(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusTeapot)
+
+	out := models.JsonResponse{
+		Status: "ok",
+        Message: devices,
+		Action: "none",
+	}
+
+	output, err := json.Marshal(out)
+	if err != nil {
+		log.Println("Error marshalling JSON")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(output)
 }
 
-func (h *Handler) CreateDeviceType(w http.ResponseWriter, r *http.Request) {
+func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")

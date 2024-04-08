@@ -18,3 +18,11 @@ type Equipment struct {
 	ManufacturerID int32  `json:"manufacturer_id"`
 	SerialNumber   string `json:"serial_number"`
 }
+
+type Message interface{}
+
+type JsonResponse struct {
+	Status  string  `json:"status"`
+	Message Message `json:"message"`
+	Action  string  `json:"action"`
+}
