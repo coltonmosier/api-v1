@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"strings"
 	//"github.com/coltonmosier/api-v1/internal/database"
 )
 
@@ -28,9 +28,13 @@ func LoggingMiddleware(next http.Handler) http.Handler {
         wr := &wrappedWriter{w, http.StatusOK}
         next.ServeHTTP(wr, r)
 
-        ip := r.RemoteAddr
+        ip := strings.Split(r.RemoteAddr, ":")[0]
         msg := fmt.Sprintf("%s %d %s %s %s\n", ip, wr.status, r.Method, r.RequestURI, r.UserAgent())
         log.Print(msg)
+
+        // NOTE: This is for logging to the db
+
+        //ipnodots := strings.Replace(ip, ".", "", -1)
         //query := "INSERT INTO logs (ip, method, url) VALUES ($1, $2, $3)"
         //_, err := LogDB.Exec(query, ip, r.Method, r.RequestURI)
         //if err != nil {

@@ -28,14 +28,16 @@ func main() {
     LogDB = database.InitLoggingDatabase()
 
     devices := handlers.DeviceHandler{}
+    manufactuerers := handlers.ManufactuerHandler{}
 
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
     // NOTE: Device Type routes
-    r.HandleFunc("GET /api/v1/device_type", devices.GetDeviceType)
+    r.HandleFunc("GET /api/v1/device_type", devices.GetDeviceTypes)
     r.HandleFunc("POST /api/v1/device_type/{name}", devices.CreateDeviceType)
     // NOTE: Manufacturer routes
+    r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
 
     // NOTE: Equipment routes
 
