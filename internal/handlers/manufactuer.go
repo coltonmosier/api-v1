@@ -103,24 +103,24 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 		return
 	}
 
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
-        return
-    }
-        
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
+		return
+	}
+
 	name := r.PathValue("name")
 	if name == "" {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "PATH /api/v1/{id}/name/{newName}")
 		return
 	}
 
-    err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer name", "PATCH /api/v1/manufacturer/{id}/name/{newName}")
-        return
-    }
+	err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer name", "PATCH /api/v1/manufacturer/{id}/name/{newName}")
+		return
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name)
+	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name)
 }
 
 func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *http.Request) {
@@ -155,28 +155,28 @@ func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *
 		return
 	}
 
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
-        return
-    }
-        
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
+		return
+	}
+
 	status := r.PathValue("status")
 	if status == "" {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing status", "PATH /api/v1/{id}/status/{newStatus}")
 		return
 	}
-    if status == string(sqlc.ManufacturerStatusActive){
-        err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
-    } else {
-        err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
-    }
+	if status == string(sqlc.ManufacturerStatusActive) {
+		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
+	} else {
+		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
+	}
 
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status", "PATCH /api/v1/manufacturer/{id}/status/{newStatus}")
-        return
-    }
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status", "PATCH /api/v1/manufacturer/{id}/status/{newStatus}")
+		return
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with status of "+status)
+	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with status of "+status)
 }
 
 func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.Request) {
@@ -185,42 +185,18 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
 		return
 	}
+
 	name := r.PathValue("name")
 	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/manufacturer/{name}")
-	}
-	// check if name already exists within db
-	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer")
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer", "PATCH /api/v1/manufacturer/{name}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/manufacturer/{newManufacturerName}")
 		return
-	}
-	defer resp.Body.Close()
-	var req []models.Manufacturer
-	err = json.NewDecoder(resp.Body).Decode(&req)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/manufacturer/{name}")
-		return
-	}
-
-	for _, v := range req {
-		if v.Name == name {
-            // NOTE: I have the ID and name of the manufacturer and can update the name
-			err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: v.ID, Name: name})
-            if err != nil {
-                helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer", "PATCH /api/v1/manufacturer/{name}")
-                return
-            }
-            helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name)
-            return
-		}
 	}
 
 	err = q.CreateManufacturer(r.Context(), name)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not create", "POST /api/v1/manufacturer/{name}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new manufacturer to database", "POST /api/v1/manufacturer/{newManufacturerName}")
 		return
 	}
 
-	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer created with name of "+name)
+	helpers.JsonResponseSuccess(w, http.StatusCreated, "manufacturer created with name of "+name)
 }

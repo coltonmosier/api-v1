@@ -35,6 +35,7 @@ func main() {
     r.HandleFunc("GET /api/v1/manufacturer/{id}", manufactuerers.GetManufacturerByID)
     r.HandleFunc("PATCH /api/v1/manufacturer/{id}/name/{name}", manufactuerers.UpdateManufacturerName)
     r.HandleFunc("PATCH /api/v1/manufacturer/{id}/status/{status}", manufactuerers.UpdateManufacturerStatus)
+    r.HandleFunc("POST /api/v1/manufacturer/{name}", manufactuerers.CreateManufacturer)
 
 	// NOTE: Equipment routes
 
