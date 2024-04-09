@@ -20,6 +20,7 @@ func main() {
 
 	devices := handlers.DeviceHandler{}
 	manufactuerers := handlers.ManufactuerHandler{}
+    equipment := handlers.EquipmentHandler{}
 
 	r := http.NewServeMux()
 
@@ -31,6 +32,11 @@ func main() {
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
 
 	// NOTE: Equipment routes
+
+
+
+    //NOTE: Handle not found endpoints
+    r.HandleFunc("/*", equipment.BadEndpointHandler)
 
 	http.Handle("/", r)
 
