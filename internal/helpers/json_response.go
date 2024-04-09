@@ -8,6 +8,9 @@ import (
 	"github.com/coltonmosier/api-v1/internal/models"
 )
 
+// JsonResponseSuccess returns nothing
+// JsonResponseSuccess takes in a http.ResponseWriter, status int, message string
+// uses the paramaters to construct a success response for handlers
 func JsonResponseSuccess(w http.ResponseWriter, status int, message string) {
 	out := models.JsonResponse{
 		Status:  "ok",
@@ -24,6 +27,9 @@ func JsonResponseSuccess(w http.ResponseWriter, status int, message string) {
 	w.Write(output)
 }
 
+// JsonResponseError returns nothing
+// JsonResponseError takes in a http.ResponseWriter, status int, message string, action string
+// uses the paramaters to construct an error response for handlers
 func JsonResponseError(w http.ResponseWriter, status int, message string, action string) {
 	out := models.JsonResponse{
 		Status:  "ERROR",

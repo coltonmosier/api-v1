@@ -27,9 +27,9 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTeapot)
 
 	out := models.JsonResponse{
-		Status: "ok",
-        Message: devices,
-		Action: "none",
+		Status:  "ok",
+		Message: devices,
+		Action:  "none",
 	}
 
 	output, err := json.Marshal(out)
@@ -42,51 +42,51 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DeviceHandler) GetDeviceByName(w http.ResponseWriter, r *http.Request) {
-    name := r.PathValue("name")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Getting device type by name")
-    log.Println("Device type name: ", name)
-    w.Write([]byte(`{"id": "3", "name": ` + name + `}"}`))
+	name := r.PathValue("name")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Getting device type by name")
+	log.Println("Device type name: ", name)
+	w.Write([]byte(`{"id": "3", "name": ` + name + `}"}`))
 }
 
 func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
-    id := r.PathValue("id")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Getting device type by ID")
-    log.Println("Device type ID: ", id)
-    w.Write([]byte(`{"id": ` + id + `, "name": "test"}`))
+	id := r.PathValue("id")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Getting device type by ID")
+	log.Println("Device type ID: ", id)
+	w.Write([]byte(`{"id": ` + id + `, "name": "test"}`))
 }
 
 func (h *DeviceHandler) UpdateDeviceTypeName(w http.ResponseWriter, r *http.Request) {
-    id := r.PathValue("id")
-    name := r.PathValue("name")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Updating device type name")
-    log.Println("Device type ID: ", id)
-    w.Write([]byte(`{"id": ` + id + `, "name": ` + name + `}`))
+	id := r.PathValue("id")
+	name := r.PathValue("name")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Updating device type name")
+	log.Println("Device type ID: ", id)
+	w.Write([]byte(`{"id": ` + id + `, "name": ` + name + `}`))
 }
 
 func (h *DeviceHandler) UpdateDeviceTypeStatus(w http.ResponseWriter, r *http.Request) {
-    id := r.PathValue("id")
-    status := r.PathValue("status")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Updating device type status")
-    log.Println("Device type ID: ", id)
-    w.Write([]byte(`{"id": ` + id + `, "status": ` + status + `}`))
+	id := r.PathValue("id")
+	status := r.PathValue("status")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Updating device type status")
+	log.Println("Device type ID: ", id)
+	w.Write([]byte(`{"id": ` + id + `, "status": ` + status + `}`))
 }
 
 func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request) {
-    name := r.PathValue("name")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Creating device type")
-    log.Println("Device type name: ", name)
-    w.Write([]byte(`{"name": ` + name + `}`))
+	name := r.PathValue("name")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Creating device type")
+	log.Println("Device type name: ", name)
+	w.Write([]byte(`{"name": ` + name + `}`))
 }
 
 func (h *DeviceHandler) DeleteDeviceType(w http.ResponseWriter, r *http.Request) {
-    id := r.PathValue("id")
-    w.WriteHeader(http.StatusOK)
-    log.Println("Deleting device type")
-    log.Println("Device type ID: ", id)
-    w.Write([]byte(`{"id": ` + id + `}`))
+	id := r.PathValue("id")
+	w.WriteHeader(http.StatusOK)
+	log.Println("Deleting device type")
+	log.Println("Device type ID: ", id)
+	w.Write([]byte(`{"id": ` + id + `}`))
 }

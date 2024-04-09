@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-    "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 )
 
 func InitEquipmentDatabase() *sql.DB {
