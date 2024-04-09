@@ -10,40 +10,40 @@ import (
 )
 
 const createDeviceType = `-- name: CreateDeviceType :exec
-INSERT INTO device_type (name) VALUES ($1)
+INSERT INTO device_type (name) VALUES (?)
 `
 
-func (q *Queries) CreateDeviceType(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, createDeviceType)
+func (q *Queries) CreateDeviceType(ctx context.Context, name string) error {
+	_, err := q.db.ExecContext(ctx, createDeviceType, name)
 	return err
 }
 
 const createManufacturer = `-- name: CreateManufacturer :exec
-INSERT INTO manufacturer (name) VALUES ($1)
+INSERT INTO manufacturer (name) VALUES (?)
 `
 
-func (q *Queries) CreateManufacturer(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, createManufacturer)
+func (q *Queries) CreateManufacturer(ctx context.Context, name string) error {
+	_, err := q.db.ExecContext(ctx, createManufacturer, name)
 	return err
 }
 
 const deleteDeviceType = `-- name: DeleteDeviceType :exec
 DELETE FROM device_type
-WHERE id = $1
+WHERE id = ?
 `
 
-func (q *Queries) DeleteDeviceType(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, deleteDeviceType)
+func (q *Queries) DeleteDeviceType(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteDeviceType, id)
 	return err
 }
 
 const deleteManufacturer = `-- name: DeleteManufacturer :exec
 DELETE FROM manufacturer
-WHERE id = $1
+WHERE id = ?
 `
 
-func (q *Queries) DeleteManufacturer(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, deleteManufacturer)
+func (q *Queries) DeleteManufacturer(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteManufacturer, id)
 	return err
 }
 
@@ -82,12 +82,12 @@ func (q *Queries) GetAllEquipment(ctx context.Context) ([]SerialNumber, error) {
 
 const getDeviceTypeById = `-- name: GetDeviceTypeById :one
 SELECT id, name, status FROM device_type
-WHERE id = $1
+WHERE id = ?
 ORDER BY id
 `
 
-func (q *Queries) GetDeviceTypeById(ctx context.Context) (DeviceType, error) {
-	row := q.db.QueryRowContext(ctx, getDeviceTypeById)
+func (q *Queries) GetDeviceTypeById(ctx context.Context, id int32) (DeviceType, error) {
+	row := q.db.QueryRowContext(ctx, getDeviceTypeById, id)
 	var i DeviceType
 	err := row.Scan(&i.ID, &i.Name, &i.Status)
 	return i, err
@@ -95,12 +95,12 @@ func (q *Queries) GetDeviceTypeById(ctx context.Context) (DeviceType, error) {
 
 const getDeviceTypeByName = `-- name: GetDeviceTypeByName :one
 SELECT id, name, status FROM device_type
-WHERE name = $1
+WHERE name = ?
 ORDER BY id
 `
 
-func (q *Queries) GetDeviceTypeByName(ctx context.Context) (DeviceType, error) {
-	row := q.db.QueryRowContext(ctx, getDeviceTypeByName)
+func (q *Queries) GetDeviceTypeByName(ctx context.Context, name string) (DeviceType, error) {
+	row := q.db.QueryRowContext(ctx, getDeviceTypeByName, name)
 	var i DeviceType
 	err := row.Scan(&i.ID, &i.Name, &i.Status)
 	return i, err
@@ -108,7 +108,6 @@ func (q *Queries) GetDeviceTypeByName(ctx context.Context) (DeviceType, error) {
 
 const getDeviceTypesActive = `-- name: GetDeviceTypesActive :many
 SELECT id, name FROM device_type
-WHERE status = 'active'
 ORDER BY id
 `
 
@@ -143,11 +142,11 @@ func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]GetDeviceTypesAct
 
 const getEquipmentByDeviceType = `-- name: GetEquipmentByDeviceType :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE device_type_id = $1
+WHERE device_type_id = ?
 `
 
-func (q *Queries) GetEquipmentByDeviceType(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceType)
+func (q *Queries) GetEquipmentByDeviceType(ctx context.Context, deviceTypeID int32) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceType, deviceTypeID)
 	if err != nil {
 		return nil, err
 	}
@@ -176,11 +175,16 @@ func (q *Queries) GetEquipmentByDeviceType(ctx context.Context) ([]SerialNumber,
 
 const getEquipmentByDeviceTypeAndManufacturer = `-- name: GetEquipmentByDeviceTypeAndManufacturer :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE device_type_id = $1 AND manufacturer_id = $2
+WHERE device_type_id = ? AND manufacturer_id = ?
 `
 
-func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndManufacturer)
+type GetEquipmentByDeviceTypeAndManufacturerParams struct {
+	DeviceTypeID   int32
+	ManufacturerID int32
+}
+
+func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context, arg GetEquipmentByDeviceTypeAndManufacturerParams) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndManufacturer, arg.DeviceTypeID, arg.ManufacturerID)
 	if err != nil {
 		return nil, err
 	}
@@ -209,11 +213,16 @@ func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context) (
 
 const getEquipmentByDeviceTypeAndSerialNumber = `-- name: GetEquipmentByDeviceTypeAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE device_type_id = $1 AND serial_number = $2
+WHERE device_type_id = ? AND serial_number = ?
 `
 
-func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndSerialNumber)
+type GetEquipmentByDeviceTypeAndSerialNumberParams struct {
+	DeviceTypeID int32
+	SerialNumber string
+}
+
+func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeAndSerialNumberParams) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndSerialNumber, arg.DeviceTypeID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -242,11 +251,17 @@ func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context) (
 
 const getEquipmentByDeviceTypeManufacturerAndSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE device_type_id = $1 AND manufacturer_id = $2 AND serial_number = $3
+WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
 `
 
-func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber)
+type GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams struct {
+	DeviceTypeID   int32
+	ManufacturerID int32
+	SerialNumber   string
+}
+
+func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber, arg.DeviceTypeID, arg.ManufacturerID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -275,11 +290,11 @@ func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx contex
 
 const getEquipmentByManufacturer = `-- name: GetEquipmentByManufacturer :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE manufacturer_id = $1
+WHERE manufacturer_id = ?
 `
 
-func (q *Queries) GetEquipmentByManufacturer(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturer)
+func (q *Queries) GetEquipmentByManufacturer(ctx context.Context, manufacturerID int32) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturer, manufacturerID)
 	if err != nil {
 		return nil, err
 	}
@@ -308,11 +323,16 @@ func (q *Queries) GetEquipmentByManufacturer(ctx context.Context) ([]SerialNumbe
 
 const getEquipmentByManufacturerAndSerialNumber = `-- name: GetEquipmentByManufacturerAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE manufacturer_id = $1 AND serial_number = $2
+WHERE manufacturer_id = ? AND serial_number = ?
 `
 
-func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturerAndSerialNumber)
+type GetEquipmentByManufacturerAndSerialNumberParams struct {
+	ManufacturerID int32
+	SerialNumber   string
+}
+
+func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturerAndSerialNumber, arg.ManufacturerID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -341,11 +361,11 @@ func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context)
 
 const getEquipmentBySerialNumber = `-- name: GetEquipmentBySerialNumber :one
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE serial_number = $1
+WHERE serial_number = ?
 `
 
-func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context) (SerialNumber, error) {
-	row := q.db.QueryRowContext(ctx, getEquipmentBySerialNumber)
+func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context, serialNumber string) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentBySerialNumber, serialNumber)
 	var i SerialNumber
 	err := row.Scan(
 		&i.AutoID,
@@ -358,11 +378,11 @@ func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context) (SerialNumber,
 
 const getEquipmentLikeSerialNumber = `-- name: GetEquipmentLikeSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
-WHERE serial_number LIKE $1
+WHERE serial_number LIKE ?
 `
 
-func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentLikeSerialNumber)
+func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context, serialNumber string) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentLikeSerialNumber, serialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -391,7 +411,7 @@ func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context) ([]SerialNum
 
 const getManufacturerById = `-- name: GetManufacturerById :one
 SELECT id, name FROM manufacturer
-WHERE id = $1
+WHERE id = ?
 ORDER BY id
 `
 
@@ -400,8 +420,8 @@ type GetManufacturerByIdRow struct {
 	Name string
 }
 
-func (q *Queries) GetManufacturerById(ctx context.Context) (GetManufacturerByIdRow, error) {
-	row := q.db.QueryRowContext(ctx, getManufacturerById)
+func (q *Queries) GetManufacturerById(ctx context.Context, id int32) (GetManufacturerByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getManufacturerById, id)
 	var i GetManufacturerByIdRow
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -409,7 +429,7 @@ func (q *Queries) GetManufacturerById(ctx context.Context) (GetManufacturerByIdR
 
 const getManufacturerByName = `-- name: GetManufacturerByName :one
 SELECT id, name FROM manufacturer
-WHERE name = $1
+WHERE name = ?
 ORDER BY id
 `
 
@@ -418,8 +438,8 @@ type GetManufacturerByNameRow struct {
 	Name string
 }
 
-func (q *Queries) GetManufacturerByName(ctx context.Context) (GetManufacturerByNameRow, error) {
-	row := q.db.QueryRowContext(ctx, getManufacturerByName)
+func (q *Queries) GetManufacturerByName(ctx context.Context, name string) (GetManufacturerByNameRow, error) {
+	row := q.db.QueryRowContext(ctx, getManufacturerByName, name)
 	var i GetManufacturerByNameRow
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -427,7 +447,6 @@ func (q *Queries) GetManufacturerByName(ctx context.Context) (GetManufacturerByN
 
 const getManufacturersActive = `-- name: GetManufacturersActive :many
 SELECT id, name FROM manufacturer
-WHERE status = 'active'
 ORDER BY id
 `
 
@@ -462,11 +481,11 @@ func (q *Queries) GetManufacturersActive(ctx context.Context) ([]GetManufacturer
 
 const getSerialNumberBySerialNumber = `-- name: GetSerialNumberBySerialNumber :one
 SELECT serial_number FROM serial_numbers
-WHERE serial_number = $1
+WHERE serial_number = ?
 `
 
-func (q *Queries) GetSerialNumberBySerialNumber(ctx context.Context) (string, error) {
-	row := q.db.QueryRowContext(ctx, getSerialNumberBySerialNumber)
+func (q *Queries) GetSerialNumberBySerialNumber(ctx context.Context, serialNumber string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getSerialNumberBySerialNumber, serialNumber)
 	var serial_number string
 	err := row.Scan(&serial_number)
 	return serial_number, err
@@ -474,11 +493,11 @@ func (q *Queries) GetSerialNumberBySerialNumber(ctx context.Context) (string, er
 
 const getSerialNumberLikeSerialNumber = `-- name: GetSerialNumberLikeSerialNumber :many
 SELECT serial_number FROM serial_numbers
-WHERE serial_number LIKE $1
+WHERE serial_number LIKE ?
 `
 
-func (q *Queries) GetSerialNumberLikeSerialNumber(ctx context.Context) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getSerialNumberLikeSerialNumber)
+func (q *Queries) GetSerialNumberLikeSerialNumber(ctx context.Context, serialNumber string) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getSerialNumberLikeSerialNumber, serialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -529,51 +548,76 @@ func (q *Queries) GetSerialNumbers(ctx context.Context) ([]string, error) {
 }
 
 const updateDeviceType = `-- name: UpdateDeviceType :exec
-UPDATE device_type SET name = $1
-WHERE id = $2
+UPDATE device_type SET name = ?
+WHERE id = ?
 `
 
-func (q *Queries) UpdateDeviceType(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, updateDeviceType)
+type UpdateDeviceTypeParams struct {
+	Name string
+	ID   int32
+}
+
+func (q *Queries) UpdateDeviceType(ctx context.Context, arg UpdateDeviceTypeParams) error {
+	_, err := q.db.ExecContext(ctx, updateDeviceType, arg.Name, arg.ID)
 	return err
 }
 
 const updateDeviceTypeStatus = `-- name: UpdateDeviceTypeStatus :exec
-UPDATE device_type SET status = $1
-WHERE id = $2
+UPDATE device_type SET status = ?
+WHERE id = ?
 `
 
-func (q *Queries) UpdateDeviceTypeStatus(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, updateDeviceTypeStatus)
+type UpdateDeviceTypeStatusParams struct {
+	Status DeviceTypeStatus
+	ID     int32
+}
+
+func (q *Queries) UpdateDeviceTypeStatus(ctx context.Context, arg UpdateDeviceTypeStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateDeviceTypeStatus, arg.Status, arg.ID)
 	return err
 }
 
 const updateManufacturer = `-- name: UpdateManufacturer :exec
-UPDATE manufacturer SET name = $1
-WHERE id = $2
+UPDATE manufacturer SET name = ?
+WHERE id = ?
 `
 
-func (q *Queries) UpdateManufacturer(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, updateManufacturer)
+type UpdateManufacturerParams struct {
+	Name string
+	ID   int32
+}
+
+func (q *Queries) UpdateManufacturer(ctx context.Context, arg UpdateManufacturerParams) error {
+	_, err := q.db.ExecContext(ctx, updateManufacturer, arg.Name, arg.ID)
 	return err
 }
 
 const updateManufacturerStatus = `-- name: UpdateManufacturerStatus :exec
-UPDATE manufacturer SET status = $1
-WHERE id = $2
+UPDATE manufacturer SET status = ?
+WHERE id = ?
 `
 
-func (q *Queries) UpdateManufacturerStatus(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, updateManufacturerStatus)
+type UpdateManufacturerStatusParams struct {
+	Status ManufacturerStatus
+	ID     int32
+}
+
+func (q *Queries) UpdateManufacturerStatus(ctx context.Context, arg UpdateManufacturerStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateManufacturerStatus, arg.Status, arg.ID)
 	return err
 }
 
 const updateSerialNumber = `-- name: UpdateSerialNumber :exec
-UPDATE serial_numbers SET serial_number = $1
-WHERE serial_number = $2
+UPDATE serial_numbers SET serial_number = ?
+WHERE serial_number = ?
 `
 
-func (q *Queries) UpdateSerialNumber(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, updateSerialNumber)
+type UpdateSerialNumberParams struct {
+	SerialNumber   string
+	SerialNumber_2 string
+}
+
+func (q *Queries) UpdateSerialNumber(ctx context.Context, arg UpdateSerialNumberParams) error {
+	_, err := q.db.ExecContext(ctx, updateSerialNumber, arg.SerialNumber, arg.SerialNumber_2)
 	return err
 }

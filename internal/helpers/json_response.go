@@ -11,7 +11,7 @@ import (
 // JsonResponseSuccess returns nothing
 // JsonResponseSuccess takes in a http.ResponseWriter, status int, message string
 // uses the paramaters to construct a success response for handlers
-func JsonResponseSuccess(w http.ResponseWriter, status int, message string) {
+func JsonResponseSuccess(w http.ResponseWriter, status int, message models.Message) {
 	out := models.JsonResponse{
 		Status:  "ok",
 		Message: message,
@@ -25,6 +25,7 @@ func JsonResponseSuccess(w http.ResponseWriter, status int, message string) {
 	}
 	w.WriteHeader(status)
 	w.Write(output)
+	return
 }
 
 // JsonResponseError returns nothing

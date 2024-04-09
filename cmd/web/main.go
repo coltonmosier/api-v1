@@ -1,31 +1,22 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/coltonmosier/api-v1/internal/database"
 	"github.com/coltonmosier/api-v1/internal/handlers"
+	"github.com/coltonmosier/api-v1/internal/helpers"
 	"github.com/coltonmosier/api-v1/internal/middleware"
 	"github.com/joho/godotenv"
 )
 
-var (
-	EqDB  *sql.DB
-	LogDB *sql.DB
-)
 
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
-
-	EqDB = database.InitEquipmentDatabase()
-	LogDB = database.InitLoggingDatabase()
 
 	devices := handlers.DeviceHandler{}
 	manufactuerers := handlers.ManufactuerHandler{}
@@ -35,7 +26,7 @@ func main() {
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
 	// NOTE: Device Type routes
 	r.HandleFunc("GET /api/v1/device_type", devices.GetDeviceTypes)
-	r.HandleFunc("POST /api/v1/device_type/{name}", devices.CreateDeviceType)
+	//r.HandleFunc("POST /api/v1/device_type/{name}", devices.CreateDeviceType)
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
 
@@ -53,7 +44,5 @@ func main() {
 }
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+    helpers.JsonResponseSuccess(w, http.StatusOK, "API is healthy")
 }
