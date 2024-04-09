@@ -41,7 +41,7 @@ func main() {
 
 
     //NOTE: Handle not found endpoints
-    //r.HandleFunc("/", equipment.BadEndpointHandler)
+    r.HandleFunc("/", equipment.BadEndpointHandler)
 
 	http.Handle("/", r)
 
