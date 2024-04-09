@@ -91,7 +91,7 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 	// NOTE: Must make a request to /api/v1/manufacturer to see if id exists...
 	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATH /api/v1/{id}/name/{newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATH /api/v1/manufacturer/{id}/name/{newName}")
 		return
 	}
 	defer resp.Body.Close()
@@ -99,7 +99,7 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATH /api/v1/{id}/name/{newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATH /api/v1/manufacturer/{id}/name/{newName}")
 		return
 	}
 
@@ -110,7 +110,7 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 
 	name := r.PathValue("name")
 	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "PATH /api/v1/{id}/name/{newName}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "PATH /api/v1/manufacturer/{id}/name/{newName}")
 		return
 	}
 

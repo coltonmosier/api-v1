@@ -28,7 +28,10 @@ func main() {
 
 	// NOTE: Device Type routes
 	r.HandleFunc("GET /api/v1/device", devices.GetDeviceTypes)
-	//r.HandleFunc("POST /api/v1/device/{id}", devices.CreateDeviceType)
+    r.HandleFunc("GET /api/v1/device/{id}", devices.GetDeviceByID)
+    r.HandleFunc("PATCH /api/v1/device/{id}/name/{name}", devices.UpdateDeviceTypeName)
+    r.HandleFunc("PATCH /api/v1/device/{id}/status/{status}", devices.UpdateDeviceTypeStatus)
+	r.HandleFunc("POST /api/v1/device/{name}", devices.CreateDeviceType)
 
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
