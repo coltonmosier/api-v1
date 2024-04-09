@@ -26,7 +26,7 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
         out = append(out, models.DeviceType{
             ID:     v.ID,
             Name:   v.Name,
-            Status: "active",
+            Status: v.Status,
         })
     }
     

@@ -107,13 +107,14 @@ func (q *Queries) GetDeviceTypeByName(ctx context.Context, name string) (DeviceT
 }
 
 const getDeviceTypesActive = `-- name: GetDeviceTypesActive :many
-SELECT id, name FROM device_type
+SELECT id, name, status FROM device_type
 ORDER BY id
 `
 
 type GetDeviceTypesActiveRow struct {
 	ID   int32
 	Name string
+    Status string
 }
 
 // DEVICETYPE QUERIES
@@ -126,7 +127,7 @@ func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]GetDeviceTypesAct
 	var items []GetDeviceTypesActiveRow
 	for rows.Next() {
 		var i GetDeviceTypesActiveRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -410,7 +411,7 @@ func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context, serialNumber
 }
 
 const getManufacturerById = `-- name: GetManufacturerById :one
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 WHERE id = ?
 ORDER BY id
 `
@@ -418,12 +419,13 @@ ORDER BY id
 type GetManufacturerByIdRow struct {
 	ID   int32
 	Name string
+    Status string
 }
 
 func (q *Queries) GetManufacturerById(ctx context.Context, id int32) (GetManufacturerByIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getManufacturerById, id)
 	var i GetManufacturerByIdRow
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.Status)
 	return i, err
 }
 
@@ -446,13 +448,14 @@ func (q *Queries) GetManufacturerByName(ctx context.Context, name string) (GetMa
 }
 
 const getManufacturersActive = `-- name: GetManufacturersActive :many
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 ORDER BY id
 `
 
 type GetManufacturersActiveRow struct {
 	ID   int32
 	Name string
+    Status string
 }
 
 // MANUFACTURER QUERIES
@@ -465,7 +468,7 @@ func (q *Queries) GetManufacturersActive(ctx context.Context) ([]GetManufacturer
 	var items []GetManufacturersActiveRow
 	for rows.Next() {
 		var i GetManufacturersActiveRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -22,14 +22,14 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
     }
     d, err := q.GetManufacturersActive(r.Context())
     if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "something went wrong", "GET /api/v1/manufacturer")
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "something went wrong with query" + err.Error(), "GET /api/v1/manufacturer")
         return
     }
     for _, v := range d {
         out = append(out, models.Manufacturer{
             ID:     v.ID,
             Name:   v.Name,
-            Status: "active",
+            Status: v.Status,
         })
     }
     
@@ -38,7 +38,36 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 
 // TODO: Handle unexpected input. i.e. can't be a number must be a string.
 // if error, action is GET /api/v1/manufacturer
-func (h *ManufactuerHandler) GetManufacturerWithValue(w http.ResponseWriter, r *http.Request) {
+func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.Request) {
+    id := r.PathValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/manufacturer")
+		return
+	}
+
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/manufacturer")
+		return
+	}
+
+    q, err := database.InitEquipmentDatabase()
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
+        return
+    }
+    d, err := q.GetManufacturerById(r.Context(), int32(i))
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exists in database", "GET /api/v1/manufacturer")
+        return
+    }
+    out := models.Manufacturer{
+        ID: int32(i),
+        Name: d.Name,
+        Status: d.Status,
+    }
+
+    helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
 func (h *ManufactuerHandler) UpdateManufacturer(w http.ResponseWriter, r *http.Request) {
@@ -125,6 +154,3 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer created with name of "+name)
 }
 
-// TODO: do we need to delete these?
-func (h *ManufactuerHandler) DeleteManufacturer(w http.ResponseWriter, r *http.Request) {
-}

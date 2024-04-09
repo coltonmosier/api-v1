@@ -22,7 +22,7 @@ type Equipment struct {
 type Message interface{}
 
 type JsonResponse struct {
-	Status  string  `json:"status"`
-	Message Message `json:"message"`
-	Action  string  `json:"action"`
+	Status  string  `json:"Status"`
+	Message Message `json:"MSG"`
+	Action  string  `json:"Action"`
 }

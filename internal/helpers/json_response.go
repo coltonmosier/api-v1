@@ -13,7 +13,7 @@ import (
 // uses the paramaters to construct a success response for handlers
 func JsonResponseSuccess(w http.ResponseWriter, status int, message models.Message) {
 	out := models.JsonResponse{
-		Status:  "ok",
+		Status:  "SUCCESS",
 		Message: message,
 		Action:  "none",
 	}

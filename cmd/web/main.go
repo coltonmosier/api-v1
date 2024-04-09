@@ -25,11 +25,14 @@ func main() {
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
+
 	// NOTE: Device Type routes
-	r.HandleFunc("GET /api/v1/device_type", devices.GetDeviceTypes)
-	//r.HandleFunc("POST /api/v1/device_type/{name}", devices.CreateDeviceType)
+	r.HandleFunc("GET /api/v1/device", devices.GetDeviceTypes)
+	//r.HandleFunc("POST /api/v1/device/{id}", devices.CreateDeviceType)
+
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
+    r.HandleFunc("GET /api/v1/manufacturer/{id}", manufactuerers.GetManufacturerByID)
 
 	// NOTE: Equipment routes
 
