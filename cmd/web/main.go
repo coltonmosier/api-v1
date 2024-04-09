@@ -33,13 +33,15 @@ func main() {
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
     r.HandleFunc("GET /api/v1/manufacturer/{id}", manufactuerers.GetManufacturerByID)
+    r.HandleFunc("PATCH /api/v1/manufacturer/{id}/name/{name}", manufactuerers.UpdateManufacturerName)
+    //r.HandleFunc("PATCH /api/v1/manufacturer/{id}/status/{status}", manufactuerers.UpdateManufacturerStatus)
 
 	// NOTE: Equipment routes
 
 
 
     //NOTE: Handle not found endpoints
-    r.HandleFunc("/*", equipment.BadEndpointHandler)
+    //r.HandleFunc("/", equipment.BadEndpointHandler)
 
 	http.Handle("/", r)
 

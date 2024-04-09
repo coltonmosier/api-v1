@@ -33,7 +33,7 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
     helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
-func (h *DeviceHandler) GetDeviceByValue(w http.ResponseWriter, r *http.Request) {
+func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 }
 
 
