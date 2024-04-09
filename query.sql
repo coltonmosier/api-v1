@@ -85,37 +85,46 @@ WHERE serial_number = ?;
 
 -- EQUIPMENT QUERIES
 -- name: GetAllEquipment :many
-SELECT * FROM serial_numbers;
+SELECT * FROM serial_numbers
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByDeviceType :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ?;
+WHERE device_type_id = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByManufacturer :many
 SELECT * FROM serial_numbers
-WHERE manufacturer_id = ?;
+WHERE manufacturer_id = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentBySerialNumber :one
 SELECT * FROM serial_numbers
-WHERE serial_number = ?;
+WHERE serial_number = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentLikeSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE serial_number LIKE ?;
+WHERE serial_number LIKE ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByDeviceTypeAndManufacturer :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND manufacturer_id = ?;
+WHERE device_type_id = ? AND manufacturer_id = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByDeviceTypeAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND serial_number = ?;
+WHERE device_type_id = ? AND serial_number = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByManufacturerAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE manufacturer_id = ? AND serial_number = ?;
+WHERE manufacturer_id = ? AND serial_number = ?
+LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?;
+WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
+LIMIT ? OFFSET ?;
 

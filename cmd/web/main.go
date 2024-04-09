@@ -41,6 +41,24 @@ func main() {
     r.HandleFunc("POST /api/v1/manufacturer/{name}", manufactuerers.CreateManufacturer)
 
 	// NOTE: Equipment routes
+    // create equipment
+    // r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
+    // get by sn
+    // r.HandleFunc("GET /api/v1/equipment/{sn}", equipment.GetEquipmentBySN)
+    // get like sn
+    // r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}", equipment.GetEquipmentLikeSN)
+    // get by manufacturer id
+    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}", equipment.GetEquipmentByManufacturerID)
+    // get by device id
+    // r.HandleFunc("GET /api/v1/equipment/device/{id}", equipment.GetEquipmentByDeviceID)
+    // get by device id & manufacturer id
+    // r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
+    // get by device id & sn
+    // r.HandleFunc("GET /api/v1/equipment/device/{device_id}/sn/{sn}", equipment.GetEquipmentByDeviceIDAndSN)
+    // get by manufacturer id & sn
+    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndSN)
+    // get by manufacturer id & devive id & sn
+    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/device/{device_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
 
 
 
