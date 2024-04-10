@@ -42,13 +42,13 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/manufacturer")
 		return
 	}
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer")
 		return
 	}
 
@@ -59,7 +59,7 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 	}
 	d, err := q.GetManufacturerById(r.Context(), int32(i))
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exists in database", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id does not exists in database", "GET /api/v1/manufacturer")
 		return
 	}
 	out := models.Manufacturer{

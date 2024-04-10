@@ -124,3 +124,6 @@ WHERE manufacturer_id = ? AND serial_number = ?;
 SELECT * FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?;
 
+-- name: UpdateEquipment :exec
+UPDATE serial_numbers SET device_type_id = ?, manufacturer_id = ?, serial_number = ?
+WHERE serial_number = ?;

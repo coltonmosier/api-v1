@@ -544,6 +544,28 @@ func (q *Queries) UpdateDeviceTypeStatus(ctx context.Context, arg UpdateDeviceTy
 	return err
 }
 
+const updateEquipment = `-- name: UpdateEquipment :exec
+UPDATE serial_numbers SET device_type_id = ?, manufacturer_id = ?, serial_number = ?
+WHERE serial_number = ?
+`
+
+type UpdateEquipmentParams struct {
+	DeviceTypeID   int32
+	ManufacturerID int32
+	SerialNumber   string
+	SerialNumber_2 string
+}
+
+func (q *Queries) UpdateEquipment(ctx context.Context, arg UpdateEquipmentParams) error {
+	_, err := q.db.ExecContext(ctx, updateEquipment,
+		arg.DeviceTypeID,
+		arg.ManufacturerID,
+		arg.SerialNumber,
+		arg.SerialNumber_2,
+	)
+	return err
+}
+
 const updateManufacturer = `-- name: UpdateManufacturer :exec
 UPDATE manufacturer SET name = ?
 WHERE id = ?

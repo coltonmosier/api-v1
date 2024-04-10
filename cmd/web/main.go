@@ -48,13 +48,13 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/device/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceID)
     r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/device/{device_id}", equipment.GetEquipmentByDeviceIDAndSN)
-    // get by manufacturer id & sn
-    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndSN)
-    // get by manufacturer id & devive id & sn
-    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/device/{device_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
-
+    r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByManufacturerIDAndSN)
+    r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
+    r.HandleFunc("PATCH /api/v1/equipment/sn/{old_sn}/sn-new/{new_sn}", equipment.UpdateSerialNumber)
+    // edit equipment
+    r.HandleFunc("PATCH /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.UpdateEquipment)
     // create equipment
-    // r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
+    // r.HandleFunc("POST /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.CreateEquipment)
 
 
     //NOTE: Handle not found endpoints
