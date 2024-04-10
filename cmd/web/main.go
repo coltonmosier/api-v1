@@ -41,18 +41,12 @@ func main() {
     r.HandleFunc("POST /api/v1/manufacturer/{name}", manufactuerers.CreateManufacturer)
 
 	// NOTE: Equipment routes
-    // create equipment
-    // r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
-    // get by sn
-    // r.HandleFunc("GET /api/v1/equipment/{sn}", equipment.GetEquipmentBySN)
-    // get like sn
-    // r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}", equipment.GetEquipmentLikeSN)
-    // get by manufacturer id
-    // r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}", equipment.GetEquipmentByManufacturerID)
-    // get by device id
-    // r.HandleFunc("GET /api/v1/equipment/device/{id}", equipment.GetEquipmentByDeviceID)
-    // get by device id & manufacturer id
-    // r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
+    r.HandleFunc("GET /api/v1/equipment/limit/{limit}/offset/{offset}", equipment.GetEquipments)
+    r.HandleFunc("GET /api/v1/equipment/{sn}", equipment.GetEquipmentBySN)
+    r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}", equipment.GetEquipmentLikeSN)
+    r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByManufacturerID)
+    r.HandleFunc("GET /api/v1/equipment/device/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceID)
+    r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
     // get by device id & sn
     // r.HandleFunc("GET /api/v1/equipment/device/{device_id}/sn/{sn}", equipment.GetEquipmentByDeviceIDAndSN)
     // get by manufacturer id & sn
@@ -60,6 +54,8 @@ func main() {
     // get by manufacturer id & devive id & sn
     // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/device/{device_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
 
+    // create equipment
+    // r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
 
 
     //NOTE: Handle not found endpoints

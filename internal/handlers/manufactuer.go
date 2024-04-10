@@ -30,7 +30,7 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 		out = append(out, models.Manufacturer{
 			ID:     v.ID,
 			Name:   v.Name,
-			Status: v.Status,
+			Status: string(v.Status),
 		})
 	}
 
@@ -65,7 +65,7 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 	out := models.Manufacturer{
 		ID:     int32(i),
 		Name:   d.Name,
-		Status: d.Status,
+		Status: string(d.Status),
 	}
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)

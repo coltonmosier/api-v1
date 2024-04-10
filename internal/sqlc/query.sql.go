@@ -113,26 +113,21 @@ func (q *Queries) GetDeviceTypeByName(ctx context.Context, name string) (DeviceT
 }
 
 const getDeviceTypesActive = `-- name: GetDeviceTypesActive :many
-SELECT id, name FROM device_type
+SELECT id, name, status FROM device_type
 ORDER BY id
 `
 
-type GetDeviceTypesActiveRow struct {
-	ID   int32
-	Name string
-}
-
 // DEVICETYPE QUERIES
-func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]GetDeviceTypesActiveRow, error) {
+func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]DeviceType, error) {
 	rows, err := q.db.QueryContext(ctx, getDeviceTypesActive)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetDeviceTypesActiveRow
+	var items []DeviceType
 	for rows.Next() {
-		var i GetDeviceTypesActiveRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		var i DeviceType
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -235,23 +230,15 @@ func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context, a
 const getEquipmentByDeviceTypeAndSerialNumber = `-- name: GetEquipmentByDeviceTypeAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE device_type_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?
 `
 
 type GetEquipmentByDeviceTypeAndSerialNumberParams struct {
 	DeviceTypeID int32
 	SerialNumber string
-	Limit        int32
-	Offset       int32
 }
 
 func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndSerialNumber,
-		arg.DeviceTypeID,
-		arg.SerialNumber,
-		arg.Limit,
-		arg.Offset,
-	)
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndSerialNumber, arg.DeviceTypeID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -281,25 +268,16 @@ func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, a
 const getEquipmentByDeviceTypeManufacturerAndSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?
 `
 
 type GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams struct {
 	DeviceTypeID   int32
 	ManufacturerID int32
 	SerialNumber   string
-	Limit          int32
-	Offset         int32
 }
 
 func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber,
-		arg.DeviceTypeID,
-		arg.ManufacturerID,
-		arg.SerialNumber,
-		arg.Limit,
-		arg.Offset,
-	)
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber, arg.DeviceTypeID, arg.ManufacturerID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -369,23 +347,15 @@ func (q *Queries) GetEquipmentByManufacturer(ctx context.Context, arg GetEquipme
 const getEquipmentByManufacturerAndSerialNumber = `-- name: GetEquipmentByManufacturerAndSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE manufacturer_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?
 `
 
 type GetEquipmentByManufacturerAndSerialNumberParams struct {
 	ManufacturerID int32
 	SerialNumber   string
-	Limit          int32
-	Offset         int32
 }
 
 func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturerAndSerialNumber,
-		arg.ManufacturerID,
-		arg.SerialNumber,
-		arg.Limit,
-		arg.Offset,
-	)
+	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturerAndSerialNumber, arg.ManufacturerID, arg.SerialNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -415,17 +385,10 @@ func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context,
 const getEquipmentBySerialNumber = `-- name: GetEquipmentBySerialNumber :one
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE serial_number = ?
-LIMIT ? OFFSET ?
 `
 
-type GetEquipmentBySerialNumberParams struct {
-	SerialNumber string
-	Limit        int32
-	Offset       int32
-}
-
-func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context, arg GetEquipmentBySerialNumberParams) (SerialNumber, error) {
-	row := q.db.QueryRowContext(ctx, getEquipmentBySerialNumber, arg.SerialNumber, arg.Limit, arg.Offset)
+func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context, serialNumber string) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentBySerialNumber, serialNumber)
 	var i SerialNumber
 	err := row.Scan(
 		&i.AutoID,
@@ -477,62 +440,47 @@ func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context, arg GetEquip
 }
 
 const getManufacturerById = `-- name: GetManufacturerById :one
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 WHERE id = ?
 ORDER BY id
 `
 
-type GetManufacturerByIdRow struct {
-	ID   int32
-	Name string
-}
-
-func (q *Queries) GetManufacturerById(ctx context.Context, id int32) (GetManufacturerByIdRow, error) {
+func (q *Queries) GetManufacturerById(ctx context.Context, id int32) (Manufacturer, error) {
 	row := q.db.QueryRowContext(ctx, getManufacturerById, id)
-	var i GetManufacturerByIdRow
-	err := row.Scan(&i.ID, &i.Name)
+	var i Manufacturer
+	err := row.Scan(&i.ID, &i.Name, &i.Status)
 	return i, err
 }
 
 const getManufacturerByName = `-- name: GetManufacturerByName :one
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 WHERE name = ?
 ORDER BY id
 `
 
-type GetManufacturerByNameRow struct {
-	ID   int32
-	Name string
-}
-
-func (q *Queries) GetManufacturerByName(ctx context.Context, name string) (GetManufacturerByNameRow, error) {
+func (q *Queries) GetManufacturerByName(ctx context.Context, name string) (Manufacturer, error) {
 	row := q.db.QueryRowContext(ctx, getManufacturerByName, name)
-	var i GetManufacturerByNameRow
-	err := row.Scan(&i.ID, &i.Name)
+	var i Manufacturer
+	err := row.Scan(&i.ID, &i.Name, &i.Status)
 	return i, err
 }
 
 const getManufacturersActive = `-- name: GetManufacturersActive :many
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 ORDER BY id
 `
 
-type GetManufacturersActiveRow struct {
-	ID   int32
-	Name string
-}
-
 // MANUFACTURER QUERIES
-func (q *Queries) GetManufacturersActive(ctx context.Context) ([]GetManufacturersActiveRow, error) {
+func (q *Queries) GetManufacturersActive(ctx context.Context) ([]Manufacturer, error) {
 	rows, err := q.db.QueryContext(ctx, getManufacturersActive)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetManufacturersActiveRow
+	var items []Manufacturer
 	for rows.Next() {
-		var i GetManufacturersActiveRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		var i Manufacturer
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

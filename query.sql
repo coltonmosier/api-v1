@@ -1,6 +1,6 @@
 -- DEVICETYPE QUERIES
 -- name: GetDeviceTypesActive :many
-SELECT id, name FROM device_type
+SELECT id, name, status FROM device_type
 ORDER BY id;
 
 -- name: GetDeviceTypeByName :one
@@ -33,16 +33,16 @@ WHERE id = ?;
 
 -- MANUFACTURER QUERIES
 -- name: GetManufacturersActive :many
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 ORDER BY id;
 
 -- name: GetManufacturerByName :one
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 WHERE name = ?
 ORDER BY id;
 
 -- name: GetManufacturerById :one
-SELECT id, name FROM manufacturer
+SELECT id, name, status FROM manufacturer
 WHERE id = ?
 ORDER BY id;
 
@@ -100,8 +100,7 @@ LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentBySerialNumber :one
 SELECT * FROM serial_numbers
-WHERE serial_number = ?
-LIMIT ? OFFSET ?;
+WHERE serial_number = ?;
 
 -- name: GetEquipmentLikeSerialNumber :many
 SELECT * FROM serial_numbers
@@ -115,16 +114,13 @@ LIMIT ? OFFSET ?;
 
 -- name: GetEquipmentByDeviceTypeAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?;
+WHERE device_type_id = ? AND serial_number = ?;
 
 -- name: GetEquipmentByManufacturerAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE manufacturer_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?;
+WHERE manufacturer_id = ? AND serial_number = ?;
 
 -- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
-LIMIT ? OFFSET ?;
+WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?;
 
