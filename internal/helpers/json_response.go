@@ -31,7 +31,7 @@ func JsonResponseSuccess(w http.ResponseWriter, status int, message models.Messa
 // JsonResponseError returns nothing
 // JsonResponseError takes in a http.ResponseWriter, status int, message string, action string
 // uses the paramaters to construct an error response for handlers
-func JsonResponseError(w http.ResponseWriter, status int, message string, action string) {
+func JsonResponseError(w http.ResponseWriter, status int, message models.Message, action string) {
 	out := models.JsonResponse{
 		Status:  "ERROR",
 		Message: message,

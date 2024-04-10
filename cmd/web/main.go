@@ -47,8 +47,7 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByManufacturerID)
     r.HandleFunc("GET /api/v1/equipment/device/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceID)
     r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
-    // get by device id & sn
-    // r.HandleFunc("GET /api/v1/equipment/device/{device_id}/sn/{sn}", equipment.GetEquipmentByDeviceIDAndSN)
+    r.HandleFunc("GET /api/v1/equipment/sn/{sn}/device/{device_id}", equipment.GetEquipmentByDeviceIDAndSN)
     // get by manufacturer id & sn
     // r.HandleFunc("GET /api/v1/equipment/manufacturer/{manufacturer_id}/sn/{sn}", equipment.GetEquipmentByManufacturerIDAndSN)
     // get by manufacturer id & devive id & sn

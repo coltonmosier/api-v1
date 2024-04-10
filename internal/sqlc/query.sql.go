@@ -227,7 +227,7 @@ func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context, a
 	return items, nil
 }
 
-const getEquipmentByDeviceTypeAndSerialNumber = `-- name: GetEquipmentByDeviceTypeAndSerialNumber :many
+const getEquipmentByDeviceTypeAndSerialNumber = `-- name: GetEquipmentByDeviceTypeAndSerialNumber :one
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE device_type_id = ? AND serial_number = ?
 `
@@ -237,35 +237,19 @@ type GetEquipmentByDeviceTypeAndSerialNumberParams struct {
 	SerialNumber string
 }
 
-func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeAndSerialNumber, arg.DeviceTypeID, arg.SerialNumber)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []SerialNumber
-	for rows.Next() {
-		var i SerialNumber
-		if err := rows.Scan(
-			&i.AutoID,
-			&i.DeviceTypeID,
-			&i.ManufacturerID,
-			&i.SerialNumber,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeAndSerialNumberParams) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentByDeviceTypeAndSerialNumber, arg.DeviceTypeID, arg.SerialNumber)
+	var i SerialNumber
+	err := row.Scan(
+		&i.AutoID,
+		&i.DeviceTypeID,
+		&i.ManufacturerID,
+		&i.SerialNumber,
+	)
+	return i, err
 }
 
-const getEquipmentByDeviceTypeManufacturerAndSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
+const getEquipmentByDeviceTypeManufacturerAndSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :one
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
 `
@@ -276,32 +260,16 @@ type GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams struct {
 	SerialNumber   string
 }
 
-func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber, arg.DeviceTypeID, arg.ManufacturerID, arg.SerialNumber)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []SerialNumber
-	for rows.Next() {
-		var i SerialNumber
-		if err := rows.Scan(
-			&i.AutoID,
-			&i.DeviceTypeID,
-			&i.ManufacturerID,
-			&i.SerialNumber,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentByDeviceTypeManufacturerAndSerialNumber, arg.DeviceTypeID, arg.ManufacturerID, arg.SerialNumber)
+	var i SerialNumber
+	err := row.Scan(
+		&i.AutoID,
+		&i.DeviceTypeID,
+		&i.ManufacturerID,
+		&i.SerialNumber,
+	)
+	return i, err
 }
 
 const getEquipmentByManufacturer = `-- name: GetEquipmentByManufacturer :many
@@ -344,7 +312,7 @@ func (q *Queries) GetEquipmentByManufacturer(ctx context.Context, arg GetEquipme
 	return items, nil
 }
 
-const getEquipmentByManufacturerAndSerialNumber = `-- name: GetEquipmentByManufacturerAndSerialNumber :many
+const getEquipmentByManufacturerAndSerialNumber = `-- name: GetEquipmentByManufacturerAndSerialNumber :one
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE manufacturer_id = ? AND serial_number = ?
 `
@@ -354,32 +322,16 @@ type GetEquipmentByManufacturerAndSerialNumberParams struct {
 	SerialNumber   string
 }
 
-func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByManufacturerAndSerialNumberParams) ([]SerialNumber, error) {
-	rows, err := q.db.QueryContext(ctx, getEquipmentByManufacturerAndSerialNumber, arg.ManufacturerID, arg.SerialNumber)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []SerialNumber
-	for rows.Next() {
-		var i SerialNumber
-		if err := rows.Scan(
-			&i.AutoID,
-			&i.DeviceTypeID,
-			&i.ManufacturerID,
-			&i.SerialNumber,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context, arg GetEquipmentByManufacturerAndSerialNumberParams) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentByManufacturerAndSerialNumber, arg.ManufacturerID, arg.SerialNumber)
+	var i SerialNumber
+	err := row.Scan(
+		&i.AutoID,
+		&i.DeviceTypeID,
+		&i.ManufacturerID,
+		&i.SerialNumber,
+	)
+	return i, err
 }
 
 const getEquipmentBySerialNumber = `-- name: GetEquipmentBySerialNumber :one

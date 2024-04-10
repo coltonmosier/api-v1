@@ -112,15 +112,15 @@ SELECT * FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ?
 LIMIT ? OFFSET ?;
 
--- name: GetEquipmentByDeviceTypeAndSerialNumber :many
+-- name: GetEquipmentByDeviceTypeAndSerialNumber :one
 SELECT * FROM serial_numbers
 WHERE device_type_id = ? AND serial_number = ?;
 
--- name: GetEquipmentByManufacturerAndSerialNumber :many
+-- name: GetEquipmentByManufacturerAndSerialNumber :one
 SELECT * FROM serial_numbers
 WHERE manufacturer_id = ? AND serial_number = ?;
 
--- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :many
+-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :one
 SELECT * FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?;
 
