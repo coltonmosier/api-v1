@@ -30,7 +30,7 @@ func main() {
 	r.HandleFunc("GET /api/v1/device", devices.GetDeviceTypes)
     r.HandleFunc("GET /api/v1/device/{id}", devices.GetDeviceByID)
     r.HandleFunc("PATCH /api/v1/device/{id}", devices.UpdateDeviceType)
-	r.HandleFunc("POST /api/v1/device/{name}", devices.CreateDeviceType)
+	r.HandleFunc("POST /api/v1/device", devices.CreateDeviceType)
 
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)

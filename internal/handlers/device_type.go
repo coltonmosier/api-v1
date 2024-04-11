@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -39,13 +40,13 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/device/{id}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing devie id", "GET /api/v1/device/{id}")
 		return
 	}
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/device/{id}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/device/{id}")
 		return
 	}
 
@@ -56,7 +57,7 @@ func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 	}
 	d, err := q.GetDeviceTypeById(r.Context(), int32(i))
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exists in database", "GET /api/v1/device")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id does not exists in database", "GET /api/v1/device")
 		return
 	}
 	out := models.DeviceType{
@@ -76,13 +77,13 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 	}
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GPATCHET /api/v1/device/{id}?name={newName}&status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
 		return
 	}
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/device")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/device")
 		return
 	}
 
@@ -134,7 +135,7 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 		}
 		helpers.JsonResponseSuccess(w, http.StatusOK, "device updated with name of "+name+" and status of "+status)
 		return
-	} else if name != "" {
+	} else if name != ""  && status == ""{
 		err = q.UpdateDeviceType(r.Context(), sqlc.UpdateDeviceTypeParams{ID: int32(i), Name: name})
 		if err != nil {
 			helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device name", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
@@ -142,7 +143,7 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 		}
 		helpers.JsonResponseSuccess(w, http.StatusOK, "device updated with name of "+name)
 		return
-	} else {
+	} else if status != "" && name == ""{
 		if status == string(sqlc.DeviceTypeStatusActive) {
 			err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusActive})
 			if err != nil {
@@ -167,21 +168,84 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/device")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "POST /api/v1/device?name={newName}")
 		return
 	}
 
-	name := r.PathValue("name")
-	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/device/{newDeviceName}")
-		return
-	}
+    name := r.FormValue("name")
+    if name == "" {
+        helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/device?name={newName}")
+        return
+    }
 
-	err = q.CreateDeviceType(r.Context(), name)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new device to database", "POST /api/v1/device/{newDeviceName}")
-		return
-	}
+    req, err := http.Get("http://localhost:8081/api/v1/device")
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device", "POST /api/v1/device?name={newName}")
+        return
+    }
+    defer req.Body.Close()
 
-	helpers.JsonResponseSuccess(w, http.StatusCreated, "device created with name of "+name)
+    var resp models.JsonResponse
+    err = json.NewDecoder(req.Body).Decode(&resp)
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "POST /api/v1/device?name={newName}")
+        return
+    }
+
+    if resp.Status == "ERROR" {
+        helpers.JsonResponseError(w, http.StatusBadRequest, resp.Message, "POST /api/v1/device?name={newName}")
+        return
+    }
+
+    var device []models.DeviceType 
+    for _, v := range resp.Message.([]interface{}) {
+        if m, ok := v.(map[string]interface{}); ok {
+        // Extract values from the map and create a DeviceType instance
+        var d models.DeviceType
+        if id, ok := m["id"].(float64); ok {
+            d.ID = int32(id)
+        } else {
+            // Handle error when id cannot be converted to float64
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert id to float64", "POST /api/v1/device?name={newName}")
+            return
+        }
+        if name, ok := m["name"].(string); ok {
+            d.Name = name
+        } else {
+            // Handle error when name cannot be converted to string
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert name to string", "POST /api/v1/device?name={newName}")
+            return
+        }
+        if status, ok := m["status"].(string); ok {
+            d.Status = status
+        } else {
+            // Handle error when status cannot be converted to string
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert status to string", "POST /api/v1/device?name={newName}")
+            return
+        }
+        // Add the created DeviceType instance to the device slice
+        device = append(device, d)
+    } else {
+        // Type assertion failed for an element in the slice
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to assert map[string]interface{} type", "POST /api/v1/device?name={newName}")
+        return
+    }
+    }
+
+    for _, v := range device {
+        if v.Name == name {
+            helpers.JsonResponseError(w, http.StatusBadRequest, "device type already exists", "POST /api/v1/device?name={newName}")
+            return
+        }
+    }
+
+    log.Println("Creating device type with name of "+name)
+
+    err = q.CreateDeviceType(r.Context(), name)
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to create device", "POST /api/v1/device?name={newName}")
+        return
+    }
+
+    helpers.JsonResponseSuccess(w, http.StatusOK, "device created with name of "+name)
 }
