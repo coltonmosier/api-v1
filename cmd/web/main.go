@@ -29,8 +29,7 @@ func main() {
 	// NOTE: Device Type routes
 	r.HandleFunc("GET /api/v1/device", devices.GetDeviceTypes)
     r.HandleFunc("GET /api/v1/device/{id}", devices.GetDeviceByID)
-    r.HandleFunc("PATCH /api/v1/device/{id}/name/{name}", devices.UpdateDeviceTypeName)
-    r.HandleFunc("PATCH /api/v1/device/{id}/status/{status}", devices.UpdateDeviceTypeStatus)
+    r.HandleFunc("PATCH /api/v1/device/{id}", devices.UpdateDeviceType)
 	r.HandleFunc("POST /api/v1/device/{name}", devices.CreateDeviceType)
 
 	// NOTE: Manufacturer routes
@@ -41,9 +40,10 @@ func main() {
     r.HandleFunc("POST /api/v1/manufacturer/{name}", manufactuerers.CreateManufacturer)
 
 	// NOTE: Equipment routes
-    r.HandleFunc("GET /api/v1/equipment/limit/{limit}/offset/{offset}", equipment.GetEquipments)
+    r.HandleFunc("GET /api/v1/equipment", equipment.GetEquipments)
     r.HandleFunc("GET /api/v1/equipment/{sn}", equipment.GetEquipmentBySN)
-    r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}", equipment.GetEquipmentLikeSN)
+
+    r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}", equipment.GetEquipmentLikeSN)
     r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByManufacturerID)
     r.HandleFunc("GET /api/v1/equipment/device/{id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceID)
     r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}/limit/{limit}/offset/{offset}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
@@ -52,7 +52,7 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
     r.HandleFunc("PATCH /api/v1/equipment/sn/{old_sn}/sn-new/{new_sn}", equipment.UpdateSerialNumber)
     // edit equipment
-    r.HandleFunc("PATCH /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.UpdateEquipment)
+    //r.HandleFunc("PATCH /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.UpdateEquipment)
     // create equipment
     // r.HandleFunc("POST /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.CreateEquipment)
 
