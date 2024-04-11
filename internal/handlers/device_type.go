@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -238,8 +237,6 @@ func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request)
             return
         }
     }
-
-    log.Println("Creating device type with name of "+name)
 
     err = q.CreateDeviceType(r.Context(), name)
     if err != nil {

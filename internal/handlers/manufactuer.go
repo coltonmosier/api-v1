@@ -40,9 +40,15 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 // TODO: Handle unexpected input. i.e. can't be a number must be a string.
 // if error, action is GET /api/v1/manufacturer
 func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.Request) {
+	q, err := database.InitEquipmentDatabase()
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
+		return
+	}
+
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/manufacturer/{id}")
 		return
 	}
 
@@ -52,11 +58,6 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 		return
 	}
 
-	q, err := database.InitEquipmentDatabase()
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
-		return
-	}
 	d, err := q.GetManufacturerById(r.Context(), int32(i))
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id does not exists in database", "GET /api/v1/manufacturer")
@@ -71,27 +72,27 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
-func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *http.Request) {
+func (h *ManufactuerHandler) UpdateManufacturer(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
 		return
 	}
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
 		return
 	}
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer")
 		return
 	}
-	// NOTE: Must make a request to /api/v1/manufacturer to see if id exists...
+
 	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATH /api/v1/manufacturer/{id}/name/{newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
 		return
 	}
 	defer resp.Body.Close()
@@ -99,85 +100,74 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATH /api/v1/manufacturer/{id}/name/{newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
 		return
 	}
 
 	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
 		return
 	}
 
-	name := r.PathValue("name")
-	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "PATH /api/v1/manufacturer/{id}/name/{newName}")
+	name := r.FormValue("name")
+	status := r.FormValue("status")
+	if name == "" && status == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name and/or status", "PATH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+		return
+	} else if name != "" && status != "" {
+		err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
+		if err != nil {
+			helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer name", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+			return
+		}
+		if status == string(sqlc.ManufacturerStatusActive) {
+			err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
+			if err != nil {
+				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+				return
+			}
+		} else if status == string(sqlc.ManufacturerStatusInactive) {
+			err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
+			if err != nil {
+				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+				return
+			}
+		} else {
+			helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either 'active' or 'inactive'", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+			return
+		}
+		helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name+" and status of "+status)
+		return
+	} else if name != ""  && status == ""{
+		err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
+		if err != nil {
+			helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer name", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+			return
+		}
+		helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name)
+		return
+	} else if status != "" && name == ""{
+		if status == string(sqlc.ManufacturerStatusActive) {
+			err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
+			if err != nil {
+				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+				return
+			}
+		} else if status == string(sqlc.ManufacturerStatusInactive) {
+			err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
+			if err != nil {
+				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+				return
+			}
+		} else {
+			helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either 'active' or 'inactive'", "PATCH /api/v1/manufacturer/{id}?name={newName}&status={newStatus}")
+			return
+		}
+		helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with status of "+status)
 		return
 	}
-
-	err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer name", "PATCH /api/v1/manufacturer/{id}/name/{newName}")
-		return
-	}
-
-	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with name of "+name)
 }
 
-func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *http.Request) {
-	q, err := database.InitEquipmentDatabase()
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
-		return
-	}
-	id := r.PathValue("id")
-	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/manufacturer")
-		return
-	}
-
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/manufacturer")
-		return
-	}
-	// NOTE: Must make a request to /api/v1/manufacturer to see if id exists...
-	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + id)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATH /api/v1/{id}/status/{newStatus}")
-		return
-	}
-	defer resp.Body.Close()
-
-	var req models.JsonResponse
-	err = json.NewDecoder(resp.Body).Decode(&req)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATH /api/v1/{id}/status/{newStaus}")
-		return
-	}
-
-	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "id does not exist", "GET /api/v1/manufacturer")
-		return
-	}
-
-	status := r.PathValue("status")
-	if status == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing status", "PATH /api/v1/{id}/status/{newStatus}")
-		return
-	}
-	if status == string(sqlc.ManufacturerStatusActive) {
-		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
-	} else {
-		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
-	}
-
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update manufacturer status", "PATCH /api/v1/manufacturer/{id}/status/{newStatus}")
-		return
-	}
-
-	helpers.JsonResponseSuccess(w, http.StatusOK, "manufacturer updated with status of "+status)
-}
 
 func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
@@ -186,15 +176,75 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	name := r.PathValue("name")
+	name := r.FormValue("name")
 	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/manufacturer/{newManufacturerName}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name", "POST /api/v1/manufacturer?name={newManufacturerName}")
 		return
 	}
 
+    req, err := http.Get("http://localhost:8081/api/v1/manufacturer")
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer", "POST /api/v1/manufacturer?name={newName}")
+        return
+    }
+    defer req.Body.Close()
+
+    var resp models.JsonResponse
+    err = json.NewDecoder(req.Body).Decode(&resp)
+    if err != nil {
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "POST /api/v1/manufacturer?name={newName}")
+        return
+    }
+
+    if resp.Status == "ERROR" {
+        helpers.JsonResponseError(w, http.StatusBadRequest, resp.Message, "POST /api/v1/manufacturer?name={newName}")
+        return
+    }
+
+    var manufacturer []models.Manufacturer 
+    for _, v := range resp.Message.([]interface{}) {
+        if m, ok := v.(map[string]interface{}); ok {
+        // Extract values from the map and create a Manufacturer instance
+        var d models.Manufacturer
+        if id, ok := m["id"].(float64); ok {
+            d.ID = int32(id)
+        } else {
+            // Handle error when id cannot be converted to float64
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert id to float64", "POST /api/v1/manufacturer?name={newName}")
+            return
+        }
+        if name, ok := m["name"].(string); ok {
+            d.Name = name
+        } else {
+            // Handle error when name cannot be converted to string
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert name to string", "POST /api/v1/manufacturer?name={newName}")
+            return
+        }
+        if status, ok := m["status"].(string); ok {
+            d.Status = status
+        } else {
+            // Handle error when status cannot be converted to string
+            helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert status to string", "POST /api/v1/manufacturer?name={newName}")
+            return
+        }
+        // Add the created Manufacturer instance to the manufacturer slice
+        manufacturer = append(manufacturer, d)
+    } else {
+        // Type assertion failed for an element in the slice
+        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to assert map[string]interface{} type", "POST /api/v1/manufacturer?name={newName}")
+        return
+    }
+    }
+
+    for _, v := range manufacturer {
+        if v.Name == name {
+            helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer type already exists", "POST /api/v1/manufacturer?name={newName}")
+            return
+        }
+    }
 	err = q.CreateManufacturer(r.Context(), name)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new manufacturer to database", "POST /api/v1/manufacturer/{newManufacturerName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new manufacturer to database"+err.Error(), "POST /api/v1/manufacturer/{newManufacturerName}")
 		return
 	}
 
