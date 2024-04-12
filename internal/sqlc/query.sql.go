@@ -18,6 +18,21 @@ func (q *Queries) CreateDeviceType(ctx context.Context, name string) error {
 	return err
 }
 
+const createEquipment = `-- name: CreateEquipment :exec
+INSERT INTO serial_numbers (device_type_id, manufacturer_id, serial_number) VALUES (?, ?, ?)
+`
+
+type CreateEquipmentParams struct {
+	DeviceTypeID   int32
+	ManufacturerID int32
+	SerialNumber   string
+}
+
+func (q *Queries) CreateEquipment(ctx context.Context, arg CreateEquipmentParams) error {
+	_, err := q.db.ExecContext(ctx, createEquipment, arg.DeviceTypeID, arg.ManufacturerID, arg.SerialNumber)
+	return err
+}
+
 const createManufacturer = `-- name: CreateManufacturer :exec
 INSERT INTO manufacturer (name) VALUES (?)
 `

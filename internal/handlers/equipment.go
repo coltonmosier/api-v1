@@ -26,8 +26,8 @@ func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-    limit := r.FormValue("limit")
-    offset := r.FormValue("offset")
+	limit := r.FormValue("limit")
+	offset := r.FormValue("offset")
 
 	if limit == "" {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment?limit={limit}&offset={offset}")
@@ -117,35 +117,35 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/id?id={id}")
 		return
 	}
-    id := r.FormValue("id")
-    if id == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/equipment/id?id={id}")
-        return
-    }
-    i, err := strconv.Atoi(id)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/equipment/id?id={id}")
-        return
-    }
-    
-    d, err := q.GetEquipmentByAutoID(r.Context(), int32(i))
-    if err == sql.ErrNoRows {
-        helpers.JsonResponseError(w, http.StatusNotFound, "equipment id does not exist", "GET /api/v1/equipment/id?id={id}")
-        return
-    }
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/id?id={id}")
-        return
-    }
+	id := r.FormValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "GET /api/v1/equipment/id?id={id}")
+		return
+	}
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "GET /api/v1/equipment/id?id={id}")
+		return
+	}
 
-    e := models.Equipment{
-        AutoID:         d.AutoID,
-        DeviceTypeID:   d.DeviceTypeID,
-        ManufacturerID: d.ManufacturerID,
-        SerialNumber:   d.SerialNumber,
-    }
+	d, err := q.GetEquipmentByAutoID(r.Context(), int32(i))
+	if err == sql.ErrNoRows {
+		helpers.JsonResponseError(w, http.StatusNotFound, "equipment id does not exist", "GET /api/v1/equipment/id?id={id}")
+		return
+	}
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/id?id={id}")
+		return
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, e)
+	e := models.Equipment{
+		AutoID:         d.AutoID,
+		DeviceTypeID:   d.DeviceTypeID,
+		ManufacturerID: d.ManufacturerID,
+		SerialNumber:   d.SerialNumber,
+	}
+
+	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
 func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Request) {
@@ -473,20 +473,19 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/{sn}")
 		return
 	}
-    // get equipment by sn to see if it exists
-    sn := r.PathValue("sn")
-    if sn == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
-        return
-    }
+	// get equipment by sn to see if it exists
+	sn := r.PathValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
+		return
+	}
 
-    resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/"+sn, "GET /api/v1/equipment/{sn}")
 		return
 	}
 	defer resp.Body.Close()
-
 
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
@@ -499,19 +498,19 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}")
 		return
 	}
-    
-    // get equipment by device id to see if it exists
+
+	// get equipment by device id to see if it exists
 	deviceID := r.PathValue("device_id")
 	if deviceID == "" {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "GET /api/v1/equipment/device/{id}/sn/{sn}")
 		return
 	}
 
-    id, err := strconv.Atoi(deviceID)
-    if err != nil {
+	id, err := strconv.Atoi(deviceID)
+	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "device id is not a number", "GET /api/v1/device")
 		return
-    }
+	}
 
 	resp, err = http.Get("http://localhost:8081/api/v1/device/" + deviceID)
 	if err != nil {
@@ -531,20 +530,20 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 		return
 	}
 
-    d, err := q.GetEquipmentByDeviceTypeAndSerialNumber(r.Context(), sqlc.GetEquipmentByDeviceTypeAndSerialNumberParams{SerialNumber: sn, DeviceTypeID: int32(id)})
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
-        return
-    }
+	d, err := q.GetEquipmentByDeviceTypeAndSerialNumber(r.Context(), sqlc.GetEquipmentByDeviceTypeAndSerialNumberParams{SerialNumber: sn, DeviceTypeID: int32(id)})
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
+		return
+	}
 
-    e := models.Equipment{
-        AutoID:         d.AutoID,
-        DeviceTypeID:   d.DeviceTypeID,
-        ManufacturerID: d.ManufacturerID,
-        SerialNumber:   d.SerialNumber,
-    }
+	e := models.Equipment{
+		AutoID:         d.AutoID,
+		DeviceTypeID:   d.DeviceTypeID,
+		ManufacturerID: d.ManufacturerID,
+		SerialNumber:   d.SerialNumber,
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, e)
+	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
 func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWriter, r *http.Request) {
@@ -553,20 +552,19 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/{sn}")
 		return
 	}
-    // get equipment by sn to see if it exists
-    sn := r.PathValue("sn")
-    if sn == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
-        return
-    }
+	// get equipment by sn to see if it exists
+	sn := r.PathValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
+		return
+	}
 
-    resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/"+sn, "GET /api/v1/equipment/{sn}")
 		return
 	}
 	defer resp.Body.Close()
-
 
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
@@ -580,13 +578,13 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 		return
 	}
 
-    manufacturerID := r.PathValue("manufacturer_id")
+	manufacturerID := r.PathValue("manufacturer_id")
 
-    id, err := strconv.Atoi(manufacturerID)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer/{id}")
-        return
-    }
+	id, err := strconv.Atoi(manufacturerID)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer/{id}")
+		return
+	}
 
 	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + manufacturerID)
 	if err != nil {
@@ -606,45 +604,44 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 		return
 	}
 
-    d, err := q.GetEquipmentByManufacturerAndSerialNumber(r.Context(), sqlc.GetEquipmentByManufacturerAndSerialNumberParams{SerialNumber: sn, ManufacturerID: int32(id)})
-    if err == sql.ErrNoRows{
-        helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "none")
-        return
-    } else if err != nil{
-        helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query" + err.Error(), "none")
-        return
-    }
+	d, err := q.GetEquipmentByManufacturerAndSerialNumber(r.Context(), sqlc.GetEquipmentByManufacturerAndSerialNumberParams{SerialNumber: sn, ManufacturerID: int32(id)})
+	if err == sql.ErrNoRows {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "none")
+		return
+	} else if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query"+err.Error(), "none")
+		return
+	}
 
-    out := models.Equipment{
-        AutoID: d.AutoID,
-        DeviceTypeID: d.DeviceTypeID,
-        ManufacturerID: d.ManufacturerID,
-        SerialNumber: d.SerialNumber,
-    }
+	out := models.Equipment{
+		AutoID:         d.AutoID,
+		DeviceTypeID:   d.DeviceTypeID,
+		ManufacturerID: d.ManufacturerID,
+		SerialNumber:   d.SerialNumber,
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, out)
+	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
-func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.ResponseWriter, r *http.Request){
+func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/{sn}")
 		return
 	}
-    // get equipment by sn to see if it exists
-    sn := r.PathValue("sn")
-    if sn == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
-        return
-    }
+	// get equipment by sn to see if it exists
+	sn := r.PathValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/device/{device_id}/sn/{sn}")
+		return
+	}
 
-    resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/"+sn, "GET /api/v1/equipment/{sn}")
 		return
 	}
 	defer resp.Body.Close()
-
 
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
@@ -658,13 +655,13 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 		return
 	}
 
-    manufacturerID := r.PathValue("manufacturer_id")
+	manufacturerID := r.PathValue("manufacturer_id")
 
-    mid, err := strconv.Atoi(manufacturerID)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer/{id}")
-        return
-    }
+	mid, err := strconv.Atoi(manufacturerID)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer/{id}")
+		return
+	}
 
 	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + manufacturerID)
 	if err != nil {
@@ -690,11 +687,11 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 		return
 	}
 
-    did, err := strconv.Atoi(deviceID)
-    if err != nil {
+	did, err := strconv.Atoi(deviceID)
+	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "device id is not a number", "GET /api/v1/device")
 		return
-    }
+	}
 
 	resp, err = http.Get("http://localhost:8081/api/v1/device/" + deviceID)
 	if err != nil {
@@ -714,221 +711,327 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 		return
 	}
 
-    d, err := q.GetEquipmentByDeviceTypeManufacturerAndSerialNumber(r.Context(), sqlc.GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams{
-        SerialNumber: sn,
-        DeviceTypeID: int32(did),
-        ManufacturerID: int32(mid),
-    })
+	d, err := q.GetEquipmentByDeviceTypeManufacturerAndSerialNumber(r.Context(), sqlc.GetEquipmentByDeviceTypeManufacturerAndSerialNumberParams{
+		SerialNumber:   sn,
+		DeviceTypeID:   int32(did),
+		ManufacturerID: int32(mid),
+	})
 
-    if err == sql.ErrNoRows{
-        helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
-        return
-    } else if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
-        return
-    }
+	if err == sql.ErrNoRows {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		return
+	} else if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		return
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, d)
+	helpers.JsonResponseSuccess(w, http.StatusOK, d)
 }
-func (h *EquipmentHandler) UpdateSerialNumber (w http.ResponseWriter, r *http.Request){
+func (h *EquipmentHandler) UpdateSerialNumber(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
 		return
 	}
 
-    id := r.FormValue("id") 
-    if id == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/serial-numberid={id}&sn={sn}")
-        return
-    }
-    i, err := strconv.Atoi(id)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	id := r.FormValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/serial-numberid={id}&sn={sn}")
+		return
+	}
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    resp, err := http.Get("http://localhost:8081/api/v1/equipment/id?id=" + id)
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/id?id=" + id)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/serial-number?id="+id, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
 		return
 	}
 	defer resp.Body.Close()
 
-    var req models.JsonResponse
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	var req models.JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    sn := r.FormValue("sn")
-    if sn == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	sn := r.FormValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    resp, err = http.Get("http://localhost:8081/api/v1/equipment/sn/" + sn)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/sn/"+sn, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
-    defer resp.Body.Close()
+	resp, err = http.Get("http://localhost:8081/api/v1/equipment/sn/" + sn)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/sn/"+sn, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
+	defer resp.Body.Close()
 
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    err = q.UpdateSerialNumber(r.Context(), sqlc.UpdateSerialNumberParams{AutoID: int32(i), SerialNumber: sn})
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "failed to update serial number in database", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
-        return
-    }
+	err = q.UpdateSerialNumber(r.Context(), sqlc.UpdateSerialNumberParams{AutoID: int32(i), SerialNumber: sn})
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to update serial number in database", "PATCH /api/v1/serial-number?id={id}&sn={sn}")
+		return
+	}
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, "serial number updated")
+	helpers.JsonResponseSuccess(w, http.StatusOK, "serial number updated")
 }
 
-func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Request){
-    q, err := database.InitEquipmentDatabase()
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    id := r.FormValue("id") 
-    if id == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    i, err := strconv.Atoi(id)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
+	q, err := database.InitEquipmentDatabase()
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	id := r.FormValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	_, err = strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    resp, err := http.Get("http://localhost:8081/api/v1/equipment/id?id=" + id)
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/id?id=" + id)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/serial-number?id="+id, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
 		return
 	}
 	defer resp.Body.Close()
 
-    var req models.JsonResponse
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	var req models.JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    sn := r.FormValue("sn")
-    if sn == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	sn := r.FormValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    resp, err = http.Get("http://localhost:8081/api/v1/equipment/sn/" + sn)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/sn/"+sn, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    defer resp.Body.Close()
+	resp, err = http.Get("http://localhost:8081/api/v1/equipment/sn/" + sn)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/sn/"+sn, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
 
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    
-    if req.Status == "ERROR" && req.Message != "equipment does not exist in database"{
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    tmp := req.Message.(models.Equipment)
-    if tmp.SerialNumber != sn {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	if req.Status == "ERROR" && req.Message != "equipment does not exist in database" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    did := r.FormValue("device_id")
-    if did == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	tmp := req.Message.(models.Equipment)
+	if tmp.SerialNumber != sn {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    d, err := strconv.Atoi(did)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    
-    resp, err = http.Get("http://localhost:8081/api/v1/device/" + did)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device/"+did, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    defer resp.Body.Close()
+	did := r.FormValue("device_id")
+	if did == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	d, err := strconv.Atoi(did)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/device")
-        return
-    }
-    
-    mid := r.FormValue("manufacturer_id")
-    if mid == "" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	resp, err = http.Get("http://localhost:8081/api/v1/device/" + did)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device/"+did, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
 
-    m, err := strconv.Atoi(mid)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + mid)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+mid, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
-    defer resp.Body.Close()
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/device")
+		return
+	}
 
-    err = json.NewDecoder(resp.Body).Decode(&req)
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	mid := r.FormValue("manufacturer_id")
+	if mid == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    if req.Status == "ERROR" {
-        helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
-        return
-    }
+	m, err := strconv.Atoi(mid)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
 
-    err = q.UpdateEquipment(r.Context(), sqlc.UpdateEquipmentParams{SerialNumber: sn, DeviceTypeID: int32(d), ManufacturerID: int32(m)})
-    if err != nil {
-        helpers.JsonResponseError(w, http.StatusBadRequest, "failed to update equipment in database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
-    }
+	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + mid)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+mid, "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
 
-    helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
+		return
+	}
+
+	err = q.UpdateEquipment(r.Context(), sqlc.UpdateEquipmentParams{SerialNumber: sn, DeviceTypeID: int32(d), ManufacturerID: int32(m)})
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to update equipment in database", "PATCH /api/v1/equipment?id={id}&sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
+}
+
+func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Request) {
+	q, err := database.InitEquipmentDatabase()
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	sn := r.FormValue("sn")
+	if sn == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	var req models.JsonResponse
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/sn/" + sn)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/sn/"+sn, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	if req.Status == "ERROR" && req.Message != "equipment does not exist in database" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	tmp := req.Message.(models.Equipment)
+	if tmp.SerialNumber != sn {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	did := r.FormValue("_id")
+	if did == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing  id", "POST /api/v1/equipment?sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	d, err := strconv.Atoi(did)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, " id is not a number", "POST /api/v1/equipment?sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	resp, err = http.Get("http://localhost:8081/api/v1//" + did)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1//"+did, "POST /api/v1/equipment?sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/", "POST /api/v1/equipment?sn={sn}&device_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/")
+		return
+	}
+
+	mid := r.FormValue("manufacturer_id")
+	if mid == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	m, err := strconv.Atoi(mid)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + mid)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+mid, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
+		return
+	}
+
+	err = q.CreateEquipment(r.Context(), sqlc.CreateEquipmentParams{SerialNumber: sn, DeviceTypeID: int32(d), ManufacturerID: int32(m)})
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to create equipment in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
+	}
+
+	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment created")
 }

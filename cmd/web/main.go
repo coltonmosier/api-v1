@@ -51,8 +51,7 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
     r.HandleFunc("PATCH /api/v1/equipment/sn", equipment.UpdateSerialNumber)
     r.HandleFunc("PATCH /api/v1/equipment", equipment.UpdateEquipment)
-    // create equipment
-    // r.HandleFunc("POST /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.CreateEquipment)
+    r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
 
     // NOTE: Serial number routes
 
