@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	//"github.com/coltonmosier/api-v1/internal/database"
 )
@@ -19,6 +20,7 @@ func (w *wrappedWriter) WriteHeader(status int) {
 }
 
 //var LogDB = database.InitLoggingDatabase()
+var LogFile = os.Getenv("LOG_FILE")
 
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
