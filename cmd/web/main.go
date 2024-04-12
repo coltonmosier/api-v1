@@ -46,15 +46,15 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/manufacturer/{id}", equipment.GetEquipmentByManufacturerID)
     r.HandleFunc("GET /api/v1/equipment/device/{id}", equipment.GetEquipmentByDeviceID)
     r.HandleFunc("GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByDeviceIDAndManufacturerID)
-
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/device/{device_id}", equipment.GetEquipmentByDeviceIDAndSN)
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByManufacturerIDAndSN)
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
-    r.HandleFunc("PATCH /api/v1/equipment/sn/{old_sn}/sn-new/{new_sn}", equipment.UpdateSerialNumber)
-    // edit equipment
-    //r.HandleFunc("PATCH /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.UpdateEquipment)
+    r.HandleFunc("PATCH /api/v1/equipment/sn", equipment.UpdateSerialNumber)
+    r.HandleFunc("PATCH /api/v1/equipment", equipment.UpdateEquipment)
     // create equipment
     // r.HandleFunc("POST /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.CreateEquipment)
+
+    // NOTE: Serial number routes
 
 
     //NOTE: Handle not found endpoints

@@ -505,11 +505,17 @@ func (q *Queries) GetSerialNumberLikeSerialNumber(ctx context.Context, serialNum
 
 const getSerialNumbers = `-- name: GetSerialNumbers :many
 SELECT serial_number FROM serial_numbers
+LIMIT ? OFFSET ?
 `
 
+type GetSerialNumbersParams struct {
+	Limit  int32
+	Offset int32
+}
+
 // SERIALNUMBER QUERIES
-func (q *Queries) GetSerialNumbers(ctx context.Context) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, getSerialNumbers)
+func (q *Queries) GetSerialNumbers(ctx context.Context, arg GetSerialNumbersParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getSerialNumbers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -615,15 +621,15 @@ func (q *Queries) UpdateManufacturerStatus(ctx context.Context, arg UpdateManufa
 
 const updateSerialNumber = `-- name: UpdateSerialNumber :exec
 UPDATE serial_numbers SET serial_number = ?
-WHERE serial_number = ?
+WHERE auto_id = ?
 `
 
 type UpdateSerialNumberParams struct {
-	SerialNumber   string
-	SerialNumber_2 string
+	SerialNumber string
+	AutoID       int32
 }
 
 func (q *Queries) UpdateSerialNumber(ctx context.Context, arg UpdateSerialNumberParams) error {
-	_, err := q.db.ExecContext(ctx, updateSerialNumber, arg.SerialNumber, arg.SerialNumber_2)
+	_, err := q.db.ExecContext(ctx, updateSerialNumber, arg.SerialNumber, arg.AutoID)
 	return err
 }

@@ -66,7 +66,8 @@ WHERE id = ?;
 
 -- SERIALNUMBER QUERIES
 -- name: GetSerialNumbers :many
-SELECT serial_number FROM serial_numbers;
+SELECT serial_number FROM serial_numbers
+LIMIT ? OFFSET ?;
 
 -- name: GetSerialNumberBySerialNumber :one
 SELECT serial_number FROM serial_numbers
@@ -78,7 +79,7 @@ WHERE serial_number LIKE ?;
 
 -- name: UpdateSerialNumber :exec
 UPDATE serial_numbers SET serial_number = ?
-WHERE serial_number = ?;
+WHERE auto_id = ?;
 
 
 
