@@ -141,6 +141,23 @@ func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]DeviceType, error
 	return items, nil
 }
 
+const getEquipmentByAutoID = `-- name: GetEquipmentByAutoID :one
+SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+WHERE auto_id = ?
+`
+
+func (q *Queries) GetEquipmentByAutoID(ctx context.Context, autoID int32) (SerialNumber, error) {
+	row := q.db.QueryRowContext(ctx, getEquipmentByAutoID, autoID)
+	var i SerialNumber
+	err := row.Scan(
+		&i.AutoID,
+		&i.DeviceTypeID,
+		&i.ManufacturerID,
+		&i.SerialNumber,
+	)
+	return i, err
+}
+
 const getEquipmentByDeviceType = `-- name: GetEquipmentByDeviceType :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
 WHERE device_type_id = ?

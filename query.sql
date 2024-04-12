@@ -102,6 +102,10 @@ LIMIT ? OFFSET ?;
 SELECT * FROM serial_numbers
 WHERE serial_number = ?;
 
+-- name: GetEquipmentByAutoID :one
+SELECT * FROM serial_numbers
+WHERE auto_id = ?;
+
 -- name: GetEquipmentLikeSerialNumber :many
 SELECT * FROM serial_numbers
 WHERE serial_number LIKE ?
