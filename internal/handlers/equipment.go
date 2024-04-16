@@ -19,6 +19,17 @@ func (h *EquipmentHandler) BadEndpointHandler(w http.ResponseWriter, r *http.Req
 	helpers.JsonResponseError(w, http.StatusNotFound, "endpoint not found", "none")
 }
 
+// GetEquipments get all equipment
+//	@Summary		get all equipments with limit and offset
+//	@Description	get all equipment with limit and offset facturers from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			limit	query		int	true	"limit"		minimum(1)
+//	@Param			offset	query		int	true	"offset"	minimum(1)
+//	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/equipment [get]
 func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -68,6 +79,17 @@ func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request)
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentBySN get equipment by serial number
+//	@Summary		get equipment by serial number
+//	@Description	get equipment by serial number from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			sn	query		string	true	"serial number"
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400	{object}	models.JsonResponse
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/equipment/sn [get]
 func (h *EquipmentHandler) GetEquipmentBySN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -111,6 +133,17 @@ func (h *EquipmentHandler) GetEquipmentBySN(w http.ResponseWriter, r *http.Reque
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentByID get equipment by auto ID
+//	@Summary		get equipment by auto ID
+//	@Description	get equipment by auto_id from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	query		int	true	"auto_id"	minimum(1)
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400	{object}	models.JsonResponse
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/equipment/id [get]
 func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -148,6 +181,19 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentLikeSn get equipment like serial number
+//	@Summary		get equipment like serial number
+//	@Description	get equipment like serial number from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			sn		path		string	true	"serial number"
+//	@Param			limit	query		int		true	"limit"		minimum(1)
+//	@Param			offset	query		int		true	"offset"	minimum(1)
+//	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/equipment/sn-like/{sn} [get]
 func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -206,6 +252,20 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
+
+// GetEquipmentByManufacturerID get equipment by manufacturer id
+//	@Summary		get equipment by manufacturer id
+//	@Description	get equipment by manufacturer id from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int	true	"manufacturer id"	minimum(1)
+//	@Param			limit	query		int	true	"limit"				minimum(1)
+//	@Param			offset	query		int	true	"offset"			minimum(1)
+//	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/equipment/manufacturer/{id} [get]
 func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -284,6 +344,19 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentByDeviceID get equipment by device id
+//	@Summary		get equipment by device id
+//	@Description	get equipment by device id from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int	true	"device id"	minimum(1)
+//	@Param			limit	query		int	true	"limit"		minimum(1)
+//	@Param			offset	query		int	true	"offset"	minimum(1)
+//	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/equipment/device/{id} [get]
 func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -362,6 +435,20 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentByDeviceIDAndManufacturerID get equipment by device id and manufacturer id
+//	@Summary		get equipment by device id and manufacturer id
+//	@Description	get equipment by device id and manufacturer id from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			device_id		path		int	true	"device id"			minimum(1)
+//	@Param			manufacturer_id	path		int	true	"manufacturer id"	minimum(1)
+//	@Param			limit			query		int	true	"limit"				minimum(1)
+//	@Param			offset			query		int	true	"offset"			minimum(1)
+//	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400				{object}	models.JsonResponse
+//	@Failure		500				{object}	models.JsonResponse
+//	@Router			/equipment/device/{device_id}/manufacturer/{manufacturer_id} [get]
 func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -467,6 +554,18 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentByDeviceIDAndSN get equipment by device id and serial number
+//	@Summary		get equipment by device id and serial number
+//	@Description	get equipment by device id and serial number from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			device_id	path		int		true	"device id"	minimum(1)
+//	@Param			sn			path		string	true	"serial number"
+//	@Success		200			{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400			{object}	models.JsonResponse
+//	@Failure		500			{object}	models.JsonResponse
+//	@Router			/equipment/sn/{sn}/device/{device_id} [get]
 func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -546,6 +645,18 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
 }
 
+// GetEquipmentByManufacturerIDAndSN get equipment by manufacturer id and serial number
+//	@Summary		get equipment by manufacturer id and serial number
+//	@Description	get equipment by manufacturer id and serial number from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			manufacturer_id	path		int		true	"manufacturer id"	minimum(1)
+//	@Param			sn				path		string	true	"serial number"
+//	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400				{object}	models.JsonResponse
+//	@Failure		500				{object}	models.JsonResponse
+//	@Router			/equipment/sn/{sn}/manufacturer/{manufacturer_id} [get]
 func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -623,6 +734,19 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
+// GetEquipmentByManufacturerIDAndDeviceIDAndSN get equipment by manufacturer id and serial number and device id
+//	@Summary		get equipment by manufacturer id and serial number and device id
+//	@Description	get equipment by manufacturer id and serial number and device id from the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			manufacturer_id	path		int		true	"manufacturer id"	minimum(1)
+//	@Param			device_id		path		int		true	"device id"			minimum(1)
+//	@Param			sn				path		string	true	"serial number"
+//	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400				{object}	models.JsonResponse
+//	@Failure		500				{object}	models.JsonResponse
+//	@Router			/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id} [get]
 func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -727,6 +851,19 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, d)
 }
+
+// UpdateSerialNumber update equipment serial number
+//	@Summary		update equipment serial number
+//	@Description	update equipment serial number in the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	query		int		true	"equipment id"	minimum(1)
+//	@Param			sn	query		string	true	"serial number"
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400	{object}	models.JsonResponse
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/equipment/sn [patch]
 func (h *EquipmentHandler) UpdateSerialNumber(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -796,6 +933,20 @@ func (h *EquipmentHandler) UpdateSerialNumber(w http.ResponseWriter, r *http.Req
 	helpers.JsonResponseSuccess(w, http.StatusOK, "serial number updated")
 }
 
+// UpdateEquipment update equipment
+//	@Summary		update equipment
+//	@Description	update equipment in the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id				query		int		true	"equipment id"	minimum(1)
+//	@Param			sn				query		string	true	"serial number"
+//	@Param			manufacturer_id	query		int		true	"manufacturer id"	minimum(1)
+//	@Param			device_id		query		int		true	"device id"			minimum(1)
+//	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400				{object}	models.JsonResponse
+//	@Failure		500				{object}	models.JsonResponse
+//	@Router			/equipment [patch]
 func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -930,6 +1081,19 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
 }
 
+// CreateEquipment create equipment
+//	@Summary		create equipment
+//	@Description	create equipment in the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			sn				query		string	true	"serial number"
+//	@Param			manufacturer_id	query		int		true	"manufacturer id"	minimum(1)
+//	@Param			device_id		query		int		true	"device id"			minimum(1)
+//	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		400				{object}	models.JsonResponse
+//	@Failure		500				{object}	models.JsonResponse
+//	@Router			/equipment [post]
 func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {

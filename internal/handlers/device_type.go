@@ -13,6 +13,16 @@ import (
 
 type DeviceHandler struct{}
 
+// GetDeviceTypes Getting all device types
+//	@Summary		get all device types
+//	@Description	get all device types from the database
+//	@Tags			device
+//	@x-order		1
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.JsonResponse{MSG=models.DeviceType}
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/device [get]
 func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 	var out []models.DeviceType
 	q, err := database.InitEquipmentDatabase()
@@ -36,6 +46,18 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
+// GetDeviceByID Getting a device type by id
+//	@Summary		get device type by ID
+//	@Description	get device type by ID from the database
+//	@Tags			device
+//	@x-order		2
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Device ID" minimum(1)
+//	@Success		200	{object}	models.JsonResponse{MSG=models.DeviceType}
+//	@Failure		400	{object}	models.JsonResponse
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/device/{id} [get]
 func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
@@ -68,6 +90,20 @@ func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
+//  UpdateDeviceType Updating a device type by id
+//	@Summary		update device type by ID
+//	@Description	update device type by ID from the database
+//	@Tags			device
+//	@x-order		3
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int		true	"Device ID" minimum(1)
+//	@Param			name	query		string	true	"Device Name"
+//	@Param			status	query		string	true	"Device Status" Enums(active,inactive)
+//	@Success		200		{object}	models.JsonResponse
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/device/{id} [patch]
 func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -164,6 +200,18 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+//  CreateDeviceType Creating a device type
+//	@Summary		create device type 
+//	@Description	create device type for the database
+//	@Tags			device 
+//	@x-order		4
+//	@Accept			json
+//	@Produce		json
+//	@Param			name	query		string	true	"Device Name"
+//	@Success		200		{object}	models.JsonResponse
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/device [post]
 func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {

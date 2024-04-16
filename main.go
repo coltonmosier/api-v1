@@ -9,9 +9,15 @@ import (
 	"github.com/coltonmosier/api-v1/internal/helpers"
 	"github.com/coltonmosier/api-v1/internal/middleware"
 	"github.com/joho/godotenv"
+	"github.com/swaggo/http-swagger/v2"
+    _ "github.com/coltonmosier/api-v1/docs"
 )
 
-
+//	@title			Equipment API
+//	@version		1.0
+//	@description	This is the API to interact with Equipment database
+//	@termsOfService	http://swagger.io/terms/
+//	@basePath		/api/v1
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -23,6 +29,10 @@ func main() {
     equipment := handlers.EquipmentHandler{}
 
 	r := http.NewServeMux()
+
+    r.HandleFunc("GET /swagger/*", httpSwagger.Handler(
+            httpSwagger.URL("http://localhost:8081/swagger/doc.json"),
+        ))
 
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
 

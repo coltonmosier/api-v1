@@ -9,11 +9,19 @@ import (
 	"github.com/coltonmosier/api-v1/internal/helpers"
 	"github.com/coltonmosier/api-v1/internal/models"
 	"github.com/coltonmosier/api-v1/internal/sqlc"
-	//"github.com/coltonmosier/api-v1/internal/sqlc"
 )
 
 type ManufactuerHandler struct{}
 
+// GetManufacturers Getting all manufacturers
+//	@Summary		get all manufacturers
+//	@Description	get all manufacturers from the database
+//	@Tags			manufacturer
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Manufacturer}
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/manufacturer [get]
 func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Request) {
 	var out []models.Manufacturer
 	q, err := database.InitEquipmentDatabase()
@@ -37,8 +45,17 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
-// TODO: Handle unexpected input. i.e. can't be a number must be a string.
-// if error, action is GET /api/v1/manufacturer
+// GetManufacturerByID Get a manufacturer by ID
+//	@Summary		get a manufacturer by ID
+//	@Description	get a manufacturer by ID from the database
+//	@Tags			manufacturer
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Manufacturer ID" minimum(1)
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Manufacturer}
+//	@Failure		400	{object}	models.JsonResponse
+//	@Failure		500	{object}	models.JsonResponse
+//	@Router			/manufacturer/{id} [get]
 func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -72,6 +89,19 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
+// UpdateManufacturer Update a manufacturer by ID
+//	@Summary		update a manufacturer by ID
+//	@Description	update a manufacturer by ID from the database
+//	@Tags			manufacturer
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int		true	"Manufacturer ID" minimum(1)
+//	@Param			name	query		string	true	"Manufacturer Name"
+//	@Param			status	query		string	true	"Manufacturer Status" Enums(active,inactive)
+//	@Success		200		{object}	models.JsonResponse{MSG=models.Manufacturer}
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/manufacturer/{id} [patch]
 func (h *ManufactuerHandler) UpdateManufacturer(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
@@ -169,6 +199,18 @@ func (h *ManufactuerHandler) UpdateManufacturer(w http.ResponseWriter, r *http.R
 }
 
 
+//  CreateManufacturer Creating a manufacturer
+//	@Summary		create manufacturer  
+//	@Description	create manufacturer for the database
+//	@Tags			manufacturer 
+//	@x-order		4
+//	@Accept			json
+//	@Produce		json
+//	@Param			name	query		string	true	"Manufacturer Name"
+//	@Success		200		{object}	models.JsonResponse
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/manufacturer [post]
 func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {

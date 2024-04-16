@@ -1,0 +1,891 @@
+basePath: /api/v1
+definitions:
+  models.DeviceType:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: computer
+        type: string
+      status:
+        example: active|inactive
+        type: string
+    type: object
+  models.Equipment:
+    properties:
+      auto_id:
+        example: 1
+        type: integer
+      device_type_id:
+        example: 1
+        type: integer
+      manufacturer_id:
+        example: 1
+        type: integer
+      serial_number:
+        example: SN-123456
+        type: string
+    type: object
+  models.JsonResponse:
+    properties:
+      Action:
+        description: Action is a string for response action
+        type: string
+      MSG:
+        description: Message is an interface for response message can be string, models.DeviceType,
+          models.Manufacturer, models.Equipment
+      Status:
+        description: Status is a string for response status
+        example: SUCCESS|ERROR
+        type: string
+    type: object
+  models.Manufacturer:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Apple
+        type: string
+      status:
+        example: active|inactive
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is the API to interact with Equipment database
+  termsOfService: http://swagger.io/terms/
+  title: Equipment API
+  version: "1.0"
+paths:
+  /device:
+    get:
+      consumes:
+      - application/json
+      description: get all device types from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.DeviceType'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get all device types
+      tags:
+      - device
+      x-order: 1
+    post:
+      consumes:
+      - application/json
+      description: create device type for the database
+      parameters:
+      - description: Device Name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: create device type
+      tags:
+      - device
+      x-order: 4
+  /device/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get device type by ID from the database
+      parameters:
+      - description: Device ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.DeviceType'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get device type by ID
+      tags:
+      - device
+      x-order: 2
+    patch:
+      consumes:
+      - application/json
+      description: update device type by ID from the database
+      parameters:
+      - description: Device ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: Device Name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Device Status
+        enum:
+        - active
+        - inactive
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update device type by ID
+      tags:
+      - device
+      x-order: 3
+  /equipment:
+    get:
+      consumes:
+      - application/json
+      description: get all equipment with limit and offset facturers from the database
+      parameters:
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get all equipments with limit and offset
+      tags:
+      - equipment
+    patch:
+      consumes:
+      - application/json
+      description: update equipment in the database
+      parameters:
+      - description: equipment id
+        in: query
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: serial number
+        in: query
+        name: sn
+        required: true
+        type: string
+      - description: manufacturer id
+        in: query
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: device id
+        in: query
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update equipment
+      tags:
+      - equipment
+    post:
+      consumes:
+      - application/json
+      description: create equipment in the database
+      parameters:
+      - description: serial number
+        in: query
+        name: sn
+        required: true
+        type: string
+      - description: manufacturer id
+        in: query
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: device id
+        in: query
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: create equipment
+      tags:
+      - equipment
+  /equipment/device/{device_id}/manufacturer/{manufacturer_id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by device id and manufacturer id from the database
+      parameters:
+      - description: device id
+        in: path
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      - description: manufacturer id
+        in: path
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by device id and manufacturer id
+      tags:
+      - equipment
+  /equipment/device/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by device id from the database
+      parameters:
+      - description: device id
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by device id
+      tags:
+      - equipment
+  /equipment/id:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by auto_id from the database
+      parameters:
+      - description: auto_id
+        in: query
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by auto ID
+      tags:
+      - equipment
+  /equipment/manufacturer/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by manufacturer id from the database
+      parameters:
+      - description: manufacturer id
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by manufacturer id
+      tags:
+      - equipment
+  /equipment/sn:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by serial number from the database
+      parameters:
+      - description: serial number
+        in: query
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by serial number
+      tags:
+      - equipment
+    patch:
+      consumes:
+      - application/json
+      description: update equipment serial number in the database
+      parameters:
+      - description: equipment id
+        in: query
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: serial number
+        in: query
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update equipment serial number
+      tags:
+      - equipment
+  /equipment/sn-like/{sn}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment like serial number from the database
+      parameters:
+      - description: serial number
+        in: path
+        name: sn
+        required: true
+        type: string
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment like serial number
+      tags:
+      - equipment
+  /equipment/sn/{sn}/device/{device_id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by device id and serial number from the database
+      parameters:
+      - description: device id
+        in: path
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      - description: serial number
+        in: path
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by device id and serial number
+      tags:
+      - equipment
+  /equipment/sn/{sn}/manufacturer/{manufacturer_id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by manufacturer id and serial number from the database
+      parameters:
+      - description: manufacturer id
+        in: path
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: serial number
+        in: path
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by manufacturer id and serial number
+      tags:
+      - equipment
+  /equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by manufacturer id and serial number and device id
+        from the database
+      parameters:
+      - description: manufacturer id
+        in: path
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: device id
+        in: path
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      - description: serial number
+        in: path
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by manufacturer id and serial number and device id
+      tags:
+      - equipment
+  /manufacturer:
+    get:
+      consumes:
+      - application/json
+      description: get all manufacturers from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Manufacturer'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get all manufacturers
+      tags:
+      - manufacturer
+    post:
+      consumes:
+      - application/json
+      description: create manufacturer for the database
+      parameters:
+      - description: Manufacturer Name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: create manufacturer
+      tags:
+      - manufacturer
+      x-order: 4
+  /manufacturer/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get a manufacturer by ID from the database
+      parameters:
+      - description: Manufacturer ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Manufacturer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get a manufacturer by ID
+      tags:
+      - manufacturer
+    patch:
+      consumes:
+      - application/json
+      description: update a manufacturer by ID from the database
+      parameters:
+      - description: Manufacturer ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: Manufacturer Name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Manufacturer Status
+        enum:
+        - active
+        - inactive
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Manufacturer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update a manufacturer by ID
+      tags:
+      - manufacturer
+swagger: "2.0"
