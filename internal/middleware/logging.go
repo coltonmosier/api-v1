@@ -28,6 +28,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		// NOTE: I have to do this here bc it was overwriting the Content-Type header in the response
         start := time.Now()
 		w.Header().Add("Content-Type", "application/json")
+        w.Header().Add("Access-Control-Allow-Origin", "*")
 		wr := &wrappedWriter{w, http.StatusOK}
 		next.ServeHTTP(wr, r)
 
