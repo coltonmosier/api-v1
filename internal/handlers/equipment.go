@@ -75,6 +75,7 @@ func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request)
 			DeviceTypeID:   v.DeviceTypeID,
 			ManufacturerID: v.ManufacturerID,
 			SerialNumber:   v.SerialNumber,
+			Status:         string(v.Status),
 		})
 	}
 
@@ -248,6 +249,7 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 			DeviceTypeID:   v.DeviceTypeID,
 			ManufacturerID: v.ManufacturerID,
 			SerialNumber:   v.SerialNumber,
+			Status:         string(v.Status),
 		})
 	}
 	if e == nil {
@@ -344,6 +346,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 			DeviceTypeID:   v.DeviceTypeID,
 			ManufacturerID: v.ManufacturerID,
 			SerialNumber:   v.SerialNumber,
+			Status:         string(v.Status),
 		})
 	}
 
@@ -436,6 +439,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 			DeviceTypeID:   v.DeviceTypeID,
 			ManufacturerID: v.ManufacturerID,
 			SerialNumber:   v.SerialNumber,
+			Status:         string(v.Status),
 		})
 	}
 
@@ -556,6 +560,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 			DeviceTypeID:   v.DeviceTypeID,
 			ManufacturerID: v.ManufacturerID,
 			SerialNumber:   v.SerialNumber,
+			Status:         string(v.Status),
 		})
 	}
 
@@ -1118,7 +1123,7 @@ func (h *EquipmentHandler) UpdateEquipmentStatus(w http.ResponseWriter, r *http.
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/equipment/{id}/status?status={status}")
 		return
 	}
-    i, err := strconv.Atoi(id)
+	i, err := strconv.Atoi(id)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/equipment/{id}/status?status={status}")
 		return
