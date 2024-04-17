@@ -61,6 +61,7 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/device/{device_id}", equipment.GetEquipmentByDeviceIDAndSN)
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}", equipment.GetEquipmentByManufacturerIDAndSN)
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
+    r.HandleFunc("GET /api/v1/equipment/sn-like/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDLikeSN)
     r.HandleFunc("PATCH /api/v1/equipment/sn", equipment.UpdateSerialNumber)
     r.HandleFunc("PATCH /api/v1/equipment", equipment.UpdateEquipment)
     r.HandleFunc("PATCH /api/v1/equipment/{id}/status", equipment.UpdateEquipmentStatus)
@@ -77,8 +78,8 @@ func main() {
 	s := &http.Server{
 		Addr:         ":8081",
 		Handler:      middleware.LoggingMiddleware(r),
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  1 * time.Minute,
+		WriteTimeout: 1 * time.Minute,
 	}
 	log.Fatal(s.ListenAndServe())
 }

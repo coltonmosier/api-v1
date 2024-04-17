@@ -31,7 +31,10 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		wr := &wrappedWriter{w, http.StatusOK}
 		next.ServeHTTP(wr, r)
 
-		ip := strings.Split(r.RemoteAddr, ":")[0]
+		ip := strings.Split(r.Header.Get("X-Real-IP"), ":")[0]
+        if ip == "" {
+            ip = strings.Split(r.RemoteAddr, ":")[0]
+        }
 		msg := fmt.Sprintf("%s %d %s %s %v\n", ip, wr.status, r.Method, r.RequestURI, time.Since(start))
 		log.Print(msg)
 

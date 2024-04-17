@@ -310,6 +310,46 @@ func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx contex
 	return i, err
 }
 
+const getEquipmentByDeviceTypeManufacturerLikeSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerLikeSerialNumber :many
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
+WHERE device_type_id = ? AND manufacturer_id = ? LIKE serial_number = ?
+`
+
+type GetEquipmentByDeviceTypeManufacturerLikeSerialNumberParams struct {
+	DeviceTypeID   int32
+	SerialNumber   string
+	ManufacturerID int32
+}
+
+func (q *Queries) GetEquipmentByDeviceTypeManufacturerLikeSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerLikeSerialNumberParams) ([]SerialNumber, error) {
+	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerLikeSerialNumber, arg.DeviceTypeID, arg.SerialNumber, arg.ManufacturerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SerialNumber
+	for rows.Next() {
+		var i SerialNumber
+		if err := rows.Scan(
+			&i.AutoID,
+			&i.DeviceTypeID,
+			&i.ManufacturerID,
+			&i.SerialNumber,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getEquipmentByManufacturer = `-- name: GetEquipmentByManufacturer :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE manufacturer_id = ?
