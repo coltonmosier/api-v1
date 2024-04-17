@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 	//"github.com/coltonmosier/api-v1/internal/database"
 )
 
@@ -25,12 +26,13 @@ var LogFile = os.Getenv("LOG_FILE")
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// NOTE: I have to do this here bc it was overwriting the Content-Type header in the response
+        start := time.Now()
 		w.Header().Add("Content-Type", "application/json")
 		wr := &wrappedWriter{w, http.StatusOK}
 		next.ServeHTTP(wr, r)
 
 		ip := strings.Split(r.RemoteAddr, ":")[0]
-		msg := fmt.Sprintf("%s %d %s %s %s\n", ip, wr.status, r.Method, r.RequestURI, r.UserAgent())
+		msg := fmt.Sprintf("%s %d %s %s %v\n", ip, wr.status, r.Method, r.RequestURI, time.Since(start))
 		log.Print(msg)
 
 		// NOTE: This is for logging to the db

@@ -63,7 +63,7 @@ func (q *Queries) DeleteManufacturer(ctx context.Context, id int32) error {
 }
 
 const getAllEquipment = `-- name: GetAllEquipment :many
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 LIMIT ? OFFSET ?
 `
 
@@ -87,6 +87,7 @@ func (q *Queries) GetAllEquipment(ctx context.Context, arg GetAllEquipmentParams
 			&i.DeviceTypeID,
 			&i.ManufacturerID,
 			&i.SerialNumber,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -157,7 +158,7 @@ func (q *Queries) GetDeviceTypesActive(ctx context.Context) ([]DeviceType, error
 }
 
 const getEquipmentByAutoID = `-- name: GetEquipmentByAutoID :one
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE auto_id = ?
 `
 
@@ -169,12 +170,13 @@ func (q *Queries) GetEquipmentByAutoID(ctx context.Context, autoID int32) (Seria
 		&i.DeviceTypeID,
 		&i.ManufacturerID,
 		&i.SerialNumber,
+		&i.Status,
 	)
 	return i, err
 }
 
 const getEquipmentByDeviceType = `-- name: GetEquipmentByDeviceType :many
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE device_type_id = ?
 LIMIT ? OFFSET ?
 `
@@ -199,6 +201,7 @@ func (q *Queries) GetEquipmentByDeviceType(ctx context.Context, arg GetEquipment
 			&i.DeviceTypeID,
 			&i.ManufacturerID,
 			&i.SerialNumber,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -214,7 +217,7 @@ func (q *Queries) GetEquipmentByDeviceType(ctx context.Context, arg GetEquipment
 }
 
 const getEquipmentByDeviceTypeAndManufacturer = `-- name: GetEquipmentByDeviceTypeAndManufacturer :many
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ?
 LIMIT ? OFFSET ?
 `
@@ -245,6 +248,7 @@ func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context, a
 			&i.DeviceTypeID,
 			&i.ManufacturerID,
 			&i.SerialNumber,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -260,7 +264,7 @@ func (q *Queries) GetEquipmentByDeviceTypeAndManufacturer(ctx context.Context, a
 }
 
 const getEquipmentByDeviceTypeAndSerialNumber = `-- name: GetEquipmentByDeviceTypeAndSerialNumber :one
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE device_type_id = ? AND serial_number = ?
 `
 
@@ -277,12 +281,13 @@ func (q *Queries) GetEquipmentByDeviceTypeAndSerialNumber(ctx context.Context, a
 		&i.DeviceTypeID,
 		&i.ManufacturerID,
 		&i.SerialNumber,
+		&i.Status,
 	)
 	return i, err
 }
 
 const getEquipmentByDeviceTypeManufacturerAndSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerAndSerialNumber :one
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?
 `
 
@@ -300,12 +305,13 @@ func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx contex
 		&i.DeviceTypeID,
 		&i.ManufacturerID,
 		&i.SerialNumber,
+		&i.Status,
 	)
 	return i, err
 }
 
 const getEquipmentByManufacturer = `-- name: GetEquipmentByManufacturer :many
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE manufacturer_id = ?
 LIMIT ? OFFSET ?
 `
@@ -330,6 +336,7 @@ func (q *Queries) GetEquipmentByManufacturer(ctx context.Context, arg GetEquipme
 			&i.DeviceTypeID,
 			&i.ManufacturerID,
 			&i.SerialNumber,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -345,7 +352,7 @@ func (q *Queries) GetEquipmentByManufacturer(ctx context.Context, arg GetEquipme
 }
 
 const getEquipmentByManufacturerAndSerialNumber = `-- name: GetEquipmentByManufacturerAndSerialNumber :one
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE manufacturer_id = ? AND serial_number = ?
 `
 
@@ -362,12 +369,13 @@ func (q *Queries) GetEquipmentByManufacturerAndSerialNumber(ctx context.Context,
 		&i.DeviceTypeID,
 		&i.ManufacturerID,
 		&i.SerialNumber,
+		&i.Status,
 	)
 	return i, err
 }
 
 const getEquipmentBySerialNumber = `-- name: GetEquipmentBySerialNumber :one
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE serial_number = ?
 `
 
@@ -379,12 +387,13 @@ func (q *Queries) GetEquipmentBySerialNumber(ctx context.Context, serialNumber s
 		&i.DeviceTypeID,
 		&i.ManufacturerID,
 		&i.SerialNumber,
+		&i.Status,
 	)
 	return i, err
 }
 
 const getEquipmentLikeSerialNumber = `-- name: GetEquipmentLikeSerialNumber :many
-SELECT auto_id, device_type_id, manufacturer_id, serial_number FROM serial_numbers
+SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
 WHERE serial_number LIKE ?
 LIMIT ? OFFSET ?
 `
@@ -409,6 +418,7 @@ func (q *Queries) GetEquipmentLikeSerialNumber(ctx context.Context, arg GetEquip
 			&i.DeviceTypeID,
 			&i.ManufacturerID,
 			&i.SerialNumber,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -601,6 +611,21 @@ func (q *Queries) UpdateEquipment(ctx context.Context, arg UpdateEquipmentParams
 		arg.SerialNumber,
 		arg.SerialNumber_2,
 	)
+	return err
+}
+
+const updateEquipmentStatus = `-- name: UpdateEquipmentStatus :exec
+UPDATE serial_numbers SET status = ?
+WHERE auto_id = ?
+`
+
+type UpdateEquipmentStatusParams struct {
+	Status SerialNumbersStatus
+	AutoID int32
+}
+
+func (q *Queries) UpdateEquipmentStatus(ctx context.Context, arg UpdateEquipmentStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateEquipmentStatus, arg.Status, arg.AutoID)
 	return err
 }
 

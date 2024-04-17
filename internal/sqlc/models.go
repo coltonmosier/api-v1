@@ -93,6 +93,48 @@ func (ns NullManufacturerStatus) Value() (driver.Value, error) {
 	return string(ns.ManufacturerStatus), nil
 }
 
+type SerialNumbersStatus string
+
+const (
+	SerialNumbersStatusActive   SerialNumbersStatus = "active"
+	SerialNumbersStatusInactive SerialNumbersStatus = "inactive"
+)
+
+func (e *SerialNumbersStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = SerialNumbersStatus(s)
+	case string:
+		*e = SerialNumbersStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for SerialNumbersStatus: %T", src)
+	}
+	return nil
+}
+
+type NullSerialNumbersStatus struct {
+	SerialNumbersStatus SerialNumbersStatus
+	Valid               bool // Valid is true if SerialNumbersStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullSerialNumbersStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.SerialNumbersStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.SerialNumbersStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullSerialNumbersStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.SerialNumbersStatus), nil
+}
+
 type DeviceType struct {
 	ID     int32
 	Name   string
@@ -110,4 +152,5 @@ type SerialNumber struct {
 	DeviceTypeID   int32
 	ManufacturerID int32
 	SerialNumber   string
+	Status         SerialNumbersStatus
 }

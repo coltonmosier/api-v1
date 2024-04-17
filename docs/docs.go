@@ -157,9 +157,11 @@ const docTemplate = `{
                     }
                 },
                 "x-order": 2
-            },
+            }
+        },
+        "/device/{id}/name": {
             "patch": {
-                "description": "update device type by ID from the database",
+                "description": "update device type by name ID from the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -169,7 +171,7 @@ const docTemplate = `{
                 "tags": [
                     "device"
                 ],
-                "summary": "update device type by ID",
+                "summary": "update device type by name ID",
                 "parameters": [
                     {
                         "minimum": 1,
@@ -184,6 +186,52 @@ const docTemplate = `{
                         "description": "Device Name",
                         "name": "name",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    }
+                },
+                "x-order": 3
+            }
+        },
+        "/device/{id}/status": {
+            "patch": {
+                "description": "update device type by status ID from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "update device type by status ID",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Device ID",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -1102,6 +1150,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/equipment/{id}/status": {
+            "patch": {
+                "description": "update equipment status in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "equipment"
+                ],
+                "summary": "update equipment status",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "equipment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "\"active\"",
+                            "\"inactive\""
+                        ],
+                        "type": "string",
+                        "description": "equipment status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/manufacturer": {
             "get": {
                 "description": "get all manufacturers from the database",
@@ -1241,9 +1345,11 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/manufacturer/{id}/name": {
             "patch": {
-                "description": "update a manufacturer by ID from the database",
+                "description": "update a manufacturer name by ID from the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -1253,7 +1359,7 @@ const docTemplate = `{
                 "tags": [
                     "manufacturer"
                 ],
-                "summary": "update a manufacturer by ID",
+                "summary": "update a manufacturer name by ID",
                 "parameters": [
                     {
                         "minimum": 1,
@@ -1268,6 +1374,51 @@ const docTemplate = `{
                         "description": "Manufacturer Name",
                         "name": "name",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/manufacturer/{id}/status": {
+            "patch": {
+                "description": "update a manufacturer status by ID from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "manufacturer"
+                ],
+                "summary": "update a manufacturer status by ID",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Manufacturer ID",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -1319,44 +1470,54 @@ const docTemplate = `{
     },
     "definitions": {
         "models.DeviceType": {
+            "description": "DeviceType is a struct for device type",
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "ID is an int32 for device type id",
                     "type": "integer",
                     "example": 1
                 },
                 "name": {
+                    "description": "Name is a string for device type name",
                     "type": "string",
                     "example": "computer"
                 },
                 "status": {
+                    "description": "Status is a string for device type status either active or inactive",
                     "type": "string",
                     "example": "active|inactive"
                 }
             }
         },
         "models.Equipment": {
+            "description": "Equipment is a struct for equipment",
             "type": "object",
             "properties": {
                 "auto_id": {
+                    "description": "AutoID is an int32 for equipment auto id",
                     "type": "integer",
                     "example": 1
                 },
                 "device_type_id": {
+                    "description": "DeviceTypeID is an int32 for device id",
                     "type": "integer",
                     "example": 1
                 },
                 "manufacturer_id": {
+                    "description": "ManufacturerID is an int32 for manufacturer id",
                     "type": "integer",
                     "example": 1
                 },
                 "serial_number": {
+                    "description": "SerialNumber is a string for equipment serial number",
                     "type": "string",
                     "example": "SN-123456"
                 }
             }
         },
         "models.JsonResponse": {
+            "description": "JsonResponse is a struct for response JSON message",
             "type": "object",
             "properties": {
                 "Action": {
@@ -1374,17 +1535,21 @@ const docTemplate = `{
             }
         },
         "models.Manufacturer": {
+            "description": "Manufacturer is a struct for manufacturer",
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "ID is an int32 for manufacturer id",
                     "type": "integer",
                     "example": 1
                 },
                 "name": {
+                    "description": "Name is a string for manufacturer name",
                     "type": "string",
                     "example": "Apple"
                 },
                 "status": {
+                    "description": "Status is a string for manufacturer status either active or inactive",
                     "type": "string",
                     "example": "active|inactive"
                 }

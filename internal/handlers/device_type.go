@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -53,7 +54,7 @@ func (h *DeviceHandler) GetDeviceTypes(w http.ResponseWriter, r *http.Request) {
 //	@x-order		2
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Device ID" minimum(1)
+//	@Param			id	path		int	true	"Device ID"	minimum(1)
 //	@Success		200	{object}	models.JsonResponse{MSG=models.DeviceType}
 //	@Failure		400	{object}	models.JsonResponse
 //	@Failure		500	{object}	models.JsonResponse
@@ -90,29 +91,28 @@ func (h *DeviceHandler) GetDeviceByID(w http.ResponseWriter, r *http.Request) {
 	helpers.JsonResponseSuccess(w, http.StatusOK, out)
 }
 
-//  UpdateDeviceType Updating a device type by id
-//	@Summary		update device type by ID
-//	@Description	update device type by ID from the database
+//  UpdateDeviceTypeName Updating a device type name by id
+//	@Summary		update device type by name ID
+//	@Description	update device type by name ID from the database
 //	@Tags			device
 //	@x-order		3
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int		true	"Device ID" minimum(1)
+//	@Param			id		path		int		true	"Device ID"	minimum(1)
 //	@Param			name	query		string	true	"Device Name"
-//	@Param			status	query		string	true	"Device Status" Enums(active,inactive)
 //	@Success		200		{object}	models.JsonResponse
 //	@Failure		400		{object}	models.JsonResponse
 //	@Failure		500		{object}	models.JsonResponse
-//	@Router			/device/{id} [patch]
-func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request) {
+//	@Router			/device/{id}/name [patch]
+func (h *DeviceHandler) UpdateDeviceTypeName(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/device/{id}?name={newName}")
 		return
 	}
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/device/{id}?name={newName}")
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 
 	resp, err := http.Get("http://localhost:8081/api/v1/device/" + id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device/"+id, "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device/"+id, "PATCH /api/v1/device/{id}?name={newName}")
 		return
 	}
 	defer resp.Body.Close()
@@ -132,7 +132,7 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "PATCH /api/v1/device/{id}?name={newName}")
 		return
 	}
 
@@ -142,64 +142,97 @@ func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request)
 	}
 
 	name := r.FormValue("name")
-	status := r.FormValue("status")
-	if name == "" && status == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing name and/or status", "PATH /api/v1/device/{id}?name={newName}&status={newStatus}")
+    if name == ""{
+		helpers.JsonResponseError(w, http.StatusBadRequest, "name missing", "none")
 		return
-	} else if name != "" && status != "" {
-		err = q.UpdateDeviceType(r.Context(), sqlc.UpdateDeviceTypeParams{ID: int32(i), Name: name})
-		if err != nil {
-			helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device name", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-			return
-		}
-		if status == string(sqlc.DeviceTypeStatusActive) {
-			err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusActive})
-			if err != nil {
-				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device status"+err.Error(), "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-				return
-			}
-		} else if status == string(sqlc.DeviceTypeStatusInactive) {
-			err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusInactive})
-			if err != nil {
-				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device status"+err.Error(), "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-				return
-			}
-		} else {
-			helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either 'active' or 'inactive'", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-			return
-		}
-		helpers.JsonResponseSuccess(w, http.StatusOK, "device updated with name of "+name+" and status of "+status)
+    }
+
+    err = q.UpdateDeviceType(r.Context(), sqlc.UpdateDeviceTypeParams{ID: int32(i), Name: name})
+    if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong "+err.Error(), "none")
 		return
-	} else if name != ""  && status == ""{
-		err = q.UpdateDeviceType(r.Context(), sqlc.UpdateDeviceTypeParams{ID: int32(i), Name: name})
-		if err != nil {
-			helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device name", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-			return
-		}
-		helpers.JsonResponseSuccess(w, http.StatusOK, "device updated with name of "+name)
-		return
-	} else if status != "" && name == ""{
-		if status == string(sqlc.DeviceTypeStatusActive) {
-			err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusActive})
-			if err != nil {
-				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device status"+err.Error(), "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-				return
-			}
-		} else if status == string(sqlc.DeviceTypeStatusInactive) {
-			err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusInactive})
-			if err != nil {
-				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to update device status"+err.Error(), "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-				return
-			}
-		} else {
-			helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either 'active' or 'inactive'", "PATCH /api/v1/device/{id}?name={newName}&status={newStatus}")
-			return
-		}
-		helpers.JsonResponseSuccess(w, http.StatusOK, "device updated with status of "+status)
-		return
-	}
+    }
+
+    msg := fmt.Sprintf("device type %v updated with a name of %v", i, name)
+
+    helpers.JsonResponseSuccess(w, http.StatusOK, msg)
 }
 
+//  UpdateDeviceTypeStatus Updating a device type status by id
+//	@Summary		update device type by status ID
+//	@Description	update device type by status ID from the database
+//	@Tags			device
+//	@x-order		3
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int		true	"Device ID"		minimum(1)
+//	@Param			status	query		string	true	"Device Status"	Enums(active,inactive)
+//	@Success		200		{object}	models.JsonResponse
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/device/{id}/status [patch]
+func (h *DeviceHandler) UpdateDeviceType(w http.ResponseWriter, r *http.Request) {
+	q, err := database.InitEquipmentDatabase()
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/device/{id}?status={newStatus}")
+		return
+	}
+	id := r.PathValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/device/{id}status={newStatus}")
+		return
+	}
+
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/device")
+		return
+	}
+
+	resp, err := http.Get("http://localhost:8081/api/v1/device/" + id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/device/"+id, "PATCH /api/v1/device/{id}?status={newStatus}")
+		return
+	}
+	defer resp.Body.Close()
+
+	var req models.JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/device", "PATCH /api/v1/device/{id}?status={newStatus}")
+		return
+	}
+
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/device")
+		return
+	}
+
+    status := r.FormValue("status")
+
+    if status == ""{
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status cannot be empty", "none")
+		return
+    }else if status != "active" && status != "inactive"{
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either active or inactive", "none")
+		return
+    }else if status == "active"{
+        err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusActive})
+        if err != nil{
+            helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+ err.Error(), "none")
+            return
+        }
+    } else { // status must be inactive here
+        err = q.UpdateDeviceTypeStatus(r.Context(), sqlc.UpdateDeviceTypeStatusParams{ID: int32(i), Status: sqlc.DeviceTypeStatusInactive})
+        if err != nil{
+            helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+ err.Error(), "none")
+            return
+        }
+    }
+    msg := fmt.Sprintf("device type %v with status of %v", i, status)
+
+    helpers.JsonResponseSuccess(w, http.StatusOK, msg)
+}
 //  CreateDeviceType Creating a device type
 //	@Summary		create device type 
 //	@Description	create device type for the database

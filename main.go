@@ -30,8 +30,9 @@ func main() {
 
 	r := http.NewServeMux()
 
-    r.HandleFunc("GET /swagger/*", httpSwagger.Handler(
-            httpSwagger.URL("http://localhost:8081/swagger/doc.json"),
+    r.HandleFunc("GET /api/v1/swagger/*", httpSwagger.Handler(
+            httpSwagger.URL("http://localhost:8081/api/v1/swagger/doc.json"),
+            //httpSwagger.URL("https://ec2-3-129-26-111.us-east-2.compute.amazonaws.com:8080/api/v1/swagger/doc.json"),
         ))
 
 	r.HandleFunc("GET /api/v1/health", HealthHandler)
@@ -45,7 +46,8 @@ func main() {
 	// NOTE: Manufacturer routes
 	r.HandleFunc("GET /api/v1/manufacturer", manufactuerers.GetManufacturers)
     r.HandleFunc("GET /api/v1/manufacturer/{id}", manufactuerers.GetManufacturerByID)
-    r.HandleFunc("PATCH /api/v1/manufacturer/{id}", manufactuerers.UpdateManufacturer)
+    r.HandleFunc("PATCH /api/v1/manufacturer/{id}/name", manufactuerers.UpdateManufacturerName)
+    r.HandleFunc("PATCH /api/v1/manufacturer/{id}/status", manufactuerers.UpdateManufacturerStatus)
     r.HandleFunc("POST /api/v1/manufacturer", manufactuerers.CreateManufacturer)
 
 	// NOTE: Equipment routes
@@ -61,6 +63,7 @@ func main() {
     r.HandleFunc("GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}", equipment.GetEquipmentByManufacturerIDAndDeviceIDAndSN)
     r.HandleFunc("PATCH /api/v1/equipment/sn", equipment.UpdateSerialNumber)
     r.HandleFunc("PATCH /api/v1/equipment", equipment.UpdateEquipment)
+    r.HandleFunc("PATCH /api/v1/equipment/{id}/status", equipment.UpdateEquipmentStatus)
     r.HandleFunc("POST /api/v1/equipment", equipment.CreateEquipment)
 
     // NOTE: Serial number routes

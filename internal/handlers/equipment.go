@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ func (h *EquipmentHandler) BadEndpointHandler(w http.ResponseWriter, r *http.Req
 }
 
 // GetEquipments get all equipment
+//
 //	@Summary		get all equipments with limit and offset
 //	@Description	get all equipment with limit and offset facturers from the database
 //	@Tags			equipment
@@ -80,6 +82,7 @@ func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request)
 }
 
 // GetEquipmentBySN get equipment by serial number
+//
 //	@Summary		get equipment by serial number
 //	@Description	get equipment by serial number from the database
 //	@Tags			equipment
@@ -134,6 +137,7 @@ func (h *EquipmentHandler) GetEquipmentBySN(w http.ResponseWriter, r *http.Reque
 }
 
 // GetEquipmentByID get equipment by auto ID
+//
 //	@Summary		get equipment by auto ID
 //	@Description	get equipment by auto_id from the database
 //	@Tags			equipment
@@ -182,6 +186,7 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 }
 
 // GetEquipmentLikeSn get equipment like serial number
+//
 //	@Summary		get equipment like serial number
 //	@Description	get equipment like serial number from the database
 //	@Tags			equipment
@@ -254,6 +259,7 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 }
 
 // GetEquipmentByManufacturerID get equipment by manufacturer id
+//
 //	@Summary		get equipment by manufacturer id
 //	@Description	get equipment by manufacturer id from the database
 //	@Tags			equipment
@@ -345,6 +351,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 }
 
 // GetEquipmentByDeviceID get equipment by device id
+//
 //	@Summary		get equipment by device id
 //	@Description	get equipment by device id from the database
 //	@Tags			equipment
@@ -436,6 +443,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 }
 
 // GetEquipmentByDeviceIDAndManufacturerID get equipment by device id and manufacturer id
+//
 //	@Summary		get equipment by device id and manufacturer id
 //	@Description	get equipment by device id and manufacturer id from the database
 //	@Tags			equipment
@@ -555,6 +563,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 }
 
 // GetEquipmentByDeviceIDAndSN get equipment by device id and serial number
+//
 //	@Summary		get equipment by device id and serial number
 //	@Description	get equipment by device id and serial number from the database
 //	@Tags			equipment
@@ -646,6 +655,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 }
 
 // GetEquipmentByManufacturerIDAndSN get equipment by manufacturer id and serial number
+//
 //	@Summary		get equipment by manufacturer id and serial number
 //	@Description	get equipment by manufacturer id and serial number from the database
 //	@Tags			equipment
@@ -735,6 +745,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 }
 
 // GetEquipmentByManufacturerIDAndDeviceIDAndSN get equipment by manufacturer id and serial number and device id
+//
 //	@Summary		get equipment by manufacturer id and serial number and device id
 //	@Description	get equipment by manufacturer id and serial number and device id from the database
 //	@Tags			equipment
@@ -853,6 +864,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 }
 
 // UpdateSerialNumber update equipment serial number
+//
 //	@Summary		update equipment serial number
 //	@Description	update equipment serial number in the database
 //	@Tags			equipment
@@ -934,6 +946,7 @@ func (h *EquipmentHandler) UpdateSerialNumber(w http.ResponseWriter, r *http.Req
 }
 
 // UpdateEquipment update equipment
+//
 //	@Summary		update equipment
 //	@Description	update equipment in the database
 //	@Tags			equipment
@@ -1081,7 +1094,83 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
 }
 
+// UpdateEquipmentStaus update equipment status
+//
+//	@Summary		update equipment status
+//	@Description	update equipment status in the database
+//	@Tags			equipment
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int		true	"equipment id"		minimum(1)
+//	@Param			status	query		string	true	"equipment status"	Enums("active", "inactive")
+//	@Success		200		{object}	models.JsonResponse
+//	@Failure		400		{object}	models.JsonResponse
+//	@Failure		500		{object}	models.JsonResponse
+//	@Router			/equipment/{id}/status [patch]
+func (h *EquipmentHandler) UpdateEquipmentStatus(w http.ResponseWriter, r *http.Request) {
+	q, err := database.InitEquipmentDatabase()
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+	id := r.FormValue("id")
+	if id == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+    i, err := strconv.Atoi(id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "id is not a number", "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+
+	resp, err := http.Get("http://localhost:8081/api/v1/equipment/id?id=" + id)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment?id="+id, "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+	defer resp.Body.Close()
+
+	var req models.JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+	if req.Status == "ERROR" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	}
+
+	status := r.FormValue("status")
+	if status == "" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status cannot be empty", "none")
+		return
+	}
+	if status != "active" && status != "inactive" {
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either active or inactive", "PATCH /api/v1/equipment/{id}/status?status={status}")
+		return
+	} else if status == "active" {
+		err = q.UpdateEquipmentStatus(r.Context(), sqlc.UpdateEquipmentStatusParams{AutoID: int32(i), Status: sqlc.SerialNumbersStatusActive})
+		if err != nil {
+			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement"+err.Error(), "PATCH /api/v1/equipment/{id}/status?status={status}")
+			return
+		}
+	} else { // status must be inactive here
+		err = q.UpdateEquipmentStatus(r.Context(), sqlc.UpdateEquipmentStatusParams{AutoID: int32(i), Status: sqlc.SerialNumbersStatusInactive})
+		if err != nil {
+			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement"+err.Error(), "PATCH /api/v1/equipment/{id}/status?status={status}")
+			return
+		}
+	}
+
+	msg := fmt.Sprintf("equipment with id: %v updated status to %v", i, status)
+
+	helpers.JsonResponseSuccess(w, http.StatusOK, msg)
+}
+
 // CreateEquipment create equipment
+//
 //	@Summary		create equipment
 //	@Description	create equipment in the database
 //	@Tags			equipment
@@ -1124,12 +1213,12 @@ func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Reques
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
 		return
 	} else if req.Message != "equipment does not exist in database" {
-        tmp := req.Message.(models.Equipment)
-        if tmp.SerialNumber != sn {
-            helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
-            return
-        }
-    }
+		tmp := req.Message.(models.Equipment)
+		if tmp.SerialNumber != sn {
+			helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+			return
+		}
+	}
 
 	did := r.FormValue("device")
 	if did == "" {

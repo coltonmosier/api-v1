@@ -1,33 +1,43 @@
 basePath: /api/v1
 definitions:
   models.DeviceType:
+    description: DeviceType is a struct for device type
     properties:
       id:
+        description: ID is an int32 for device type id
         example: 1
         type: integer
       name:
+        description: Name is a string for device type name
         example: computer
         type: string
       status:
+        description: Status is a string for device type status either active or inactive
         example: active|inactive
         type: string
     type: object
   models.Equipment:
+    description: Equipment is a struct for equipment
     properties:
       auto_id:
+        description: AutoID is an int32 for equipment auto id
         example: 1
         type: integer
       device_type_id:
+        description: DeviceTypeID is an int32 for device id
         example: 1
         type: integer
       manufacturer_id:
+        description: ManufacturerID is an int32 for manufacturer id
         example: 1
         type: integer
       serial_number:
+        description: SerialNumber is a string for equipment serial number
         example: SN-123456
         type: string
     type: object
   models.JsonResponse:
+    description: JsonResponse is a struct for response JSON message
     properties:
       Action:
         description: Action is a string for response action
@@ -41,14 +51,18 @@ definitions:
         type: string
     type: object
   models.Manufacturer:
+    description: Manufacturer is a struct for manufacturer
     properties:
       id:
+        description: ID is an int32 for manufacturer id
         example: 1
         type: integer
       name:
+        description: Name is a string for manufacturer name
         example: Apple
         type: string
       status:
+        description: Status is a string for manufacturer status either active or inactive
         example: active|inactive
         type: string
     type: object
@@ -149,10 +163,11 @@ paths:
       tags:
       - device
       x-order: 2
+  /device/{id}/name:
     patch:
       consumes:
       - application/json
-      description: update device type by ID from the database
+      description: update device type by name ID from the database
       parameters:
       - description: Device ID
         in: path
@@ -165,6 +180,37 @@ paths:
         name: name
         required: true
         type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update device type by name ID
+      tags:
+      - device
+      x-order: 3
+  /device/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: update device type by status ID from the database
+      parameters:
+      - description: Device ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
       - description: Device Status
         enum:
         - active
@@ -188,7 +234,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.JsonResponse'
-      summary: update device type by ID
+      summary: update device type by status ID
       tags:
       - device
       x-order: 3
@@ -323,6 +369,44 @@ paths:
           schema:
             $ref: '#/definitions/models.JsonResponse'
       summary: create equipment
+      tags:
+      - equipment
+  /equipment/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: update equipment status in the database
+      parameters:
+      - description: equipment id
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      - description: equipment status
+        enum:
+        - '"active"'
+        - '"inactive"'
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update equipment status
       tags:
       - equipment
   /equipment/device/{device_id}/manufacturer/{manufacturer_id}:
@@ -841,10 +925,11 @@ paths:
       summary: get a manufacturer by ID
       tags:
       - manufacturer
+  /manufacturer/{id}/name:
     patch:
       consumes:
       - application/json
-      description: update a manufacturer by ID from the database
+      description: update a manufacturer name by ID from the database
       parameters:
       - description: Manufacturer ID
         in: path
@@ -857,6 +942,36 @@ paths:
         name: name
         required: true
         type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: update a manufacturer name by ID
+      tags:
+      - manufacturer
+  /manufacturer/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: update a manufacturer status by ID from the database
+      parameters:
+      - description: Manufacturer ID
+        in: path
+        minimum: 1
+        name: id
+        required: true
+        type: integer
       - description: Manufacturer Status
         enum:
         - active
@@ -885,7 +1000,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.JsonResponse'
-      summary: update a manufacturer by ID
+      summary: update a manufacturer status by ID
       tags:
       - manufacturer
 swagger: "2.0"

@@ -19,6 +19,7 @@ CREATE TABLE `serial_numbers` (
   `device_type_id` int NOT NULL,
   `manufacturer_id` int NOT NULL,
   `serial_number` varchar(68) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
   UNIQUE KEY `serial_number` (`serial_number`),
   KEY `device_type_id` (`device_type_id`),
   KEY `manufacturer_id` (`manufacturer_id`),
