@@ -312,13 +312,13 @@ func (q *Queries) GetEquipmentByDeviceTypeManufacturerAndSerialNumber(ctx contex
 
 const getEquipmentByDeviceTypeManufacturerLikeSerialNumber = `-- name: GetEquipmentByDeviceTypeManufacturerLikeSerialNumber :many
 SELECT auto_id, device_type_id, manufacturer_id, serial_number, status FROM serial_numbers
-WHERE device_type_id = ? AND manufacturer_id = ? LIKE serial_number = ? LIMIT ? OFFSET ?
+WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number LIKE ? LIMIT ? OFFSET ?
 `
 
 type GetEquipmentByDeviceTypeManufacturerLikeSerialNumberParams struct {
 	DeviceTypeID   int32
-	SerialNumber   string
 	ManufacturerID int32
+	SerialNumber   string
 	Limit          int32
 	Offset         int32
 }
@@ -326,8 +326,8 @@ type GetEquipmentByDeviceTypeManufacturerLikeSerialNumberParams struct {
 func (q *Queries) GetEquipmentByDeviceTypeManufacturerLikeSerialNumber(ctx context.Context, arg GetEquipmentByDeviceTypeManufacturerLikeSerialNumberParams) ([]SerialNumber, error) {
 	rows, err := q.db.QueryContext(ctx, getEquipmentByDeviceTypeManufacturerLikeSerialNumber,
 		arg.DeviceTypeID,
-		arg.SerialNumber,
 		arg.ManufacturerID,
+		arg.SerialNumber,
 		arg.Limit,
 		arg.Offset,
 	)
