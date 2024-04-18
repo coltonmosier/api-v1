@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -1380,11 +1381,9 @@ func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Reques
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
 		return
 	} else if req.Message != "equipment does not exist in database" {
-		tmp := req.Message.(models.Equipment)
-		if tmp.SerialNumber != sn {
-			helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
-			return
-		}
+        log.Println("req.Message: ", req.Message)
+        helpers.JsonResponseError(w, http.StatusBadRequest, "equipment already exists in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+        return
 	}
 
 	did := r.FormValue("device")
