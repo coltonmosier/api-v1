@@ -284,18 +284,9 @@ const docTemplate = `{
                 "summary": "get all equipments with limit and offset",
                 "parameters": [
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "active and inactive",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -351,7 +342,7 @@ const docTemplate = `{
                         "minimum": 1,
                         "type": "integer",
                         "description": "manufacturer id",
-                        "name": "manufacturer_id",
+                        "name": "manufacturer",
                         "in": "query",
                         "required": true
                     },
@@ -359,7 +350,7 @@ const docTemplate = `{
                         "minimum": 1,
                         "type": "integer",
                         "description": "device id",
-                        "name": "device_id",
+                        "name": "device",
                         "in": "query",
                         "required": true
                     }
@@ -996,7 +987,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
+                        "minimum": 2,
                         "type": "integer",
                         "description": "offset",
                         "name": "offset",

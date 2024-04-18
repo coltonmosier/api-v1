@@ -87,17 +87,17 @@ WHERE auto_id = ?;
 -- EQUIPMENT QUERIES
 -- name: GetAllEquipment :many
 SELECT * FROM serial_numbers
-LIMIT ? OFFSET ?;
+LIMIT 1000;
 
 -- name: GetEquipmentByDeviceType :many
 SELECT * FROM serial_numbers
 WHERE device_type_id = ?
-LIMIT ? OFFSET ?;
+LIMIT 1000;
 
 -- name: GetEquipmentByManufacturer :many
 SELECT * FROM serial_numbers
 WHERE manufacturer_id = ?
-LIMIT ? OFFSET ?;
+LIMIT 1000;
 
 -- name: GetEquipmentBySerialNumber :one
 SELECT * FROM serial_numbers
@@ -110,12 +110,12 @@ WHERE auto_id = ?;
 -- name: GetEquipmentLikeSerialNumber :many
 SELECT * FROM serial_numbers
 WHERE serial_number LIKE ?
-LIMIT ? OFFSET ?;
+LIMIT 1000;
 
 -- name: GetEquipmentByDeviceTypeAndManufacturer :many
 SELECT * FROM serial_numbers
 WHERE device_type_id = ? AND manufacturer_id = ?
-LIMIT ? OFFSET ?;
+LIMIT 1000;
 
 -- name: GetEquipmentByDeviceTypeAndSerialNumber :one
 SELECT * FROM serial_numbers
@@ -131,7 +131,7 @@ WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number = ?;
 
 -- name: GetEquipmentByDeviceTypeManufacturerLikeSerialNumber :many
 SELECT * FROM serial_numbers
-WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number LIKE ? LIMIT ? OFFSET ?;
+WHERE device_type_id = ? AND manufacturer_id = ? AND serial_number LIKE ? LIMIT 1000;
 
 -- name: UpdateEquipment :exec
 UPDATE serial_numbers SET device_type_id = ?, manufacturer_id = ?, serial_number = ?

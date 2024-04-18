@@ -28,10 +28,9 @@ func (h *EquipmentHandler) BadEndpointHandler(w http.ResponseWriter, r *http.Req
 //	@Tags			equipment
 //	@Accept			json
 //	@Produce		json
-//	@Param			limit	query		int	true	"limit"		minimum(1)
-//	@Param			offset	query		int	true	"offset"	minimum(1)
-//	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
-//	@Failure		500		{object}	models.JsonResponse
+//	@Param			all	query		bool	true	"active and inactive"
+//	@Success		200	{object}	models.JsonResponse{MSG=models.Equipment}
+//	@Failure		500	{object}	models.JsonResponse
 //	@Router			/equipment [get]
 func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
@@ -39,48 +38,43 @@ func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request)
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment?limit={limit}&offset={offset}")
 		return
 	}
-
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment?limit={limit}&offset={offset}")
-		return
-	}
-
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment?limit={limit}&offset={offset}")
-		return
-	}
-
-	d, err := q.GetAllEquipment(r.Context(), sqlc.GetAllEquipmentParams{Limit: int32(l), Offset: int32(o)})
+	d, err := q.GetAllEquipment(r.Context())
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment?limit={limit}&offset={offset}")
 		return
 	}
 
-	var e []models.Equipment
-	for _, v := range d {
-		e = append(e, models.Equipment{
-			AutoID:         v.AutoID,
-			DeviceTypeID:   v.DeviceTypeID,
-			ManufacturerID: v.ManufacturerID,
-			SerialNumber:   v.SerialNumber,
-			Status:         string(v.Status),
-		})
-	}
+    all := r.FormValue("all")
+    if all == "true" {
+        var e []models.Equipment
+        for _, v := range d {
+            e = append(e, models.Equipment{
+                AutoID:         v.AutoID,
+                DeviceTypeID:   v.DeviceTypeID,
+                ManufacturerID: v.ManufacturerID,
+                SerialNumber:   v.SerialNumber,
+                Status:         string(v.Status),
+            })
+        }
 
-	helpers.JsonResponseSuccess(w, http.StatusOK, e)
+        helpers.JsonResponseSuccess(w, http.StatusOK, e)
+        return
+    } else {
+        var e []models.Equipment
+        for _, v := range d {
+            if v.Status == sqlc.SerialNumbersStatusActive {
+                e = append(e, models.Equipment{
+                    AutoID:         v.AutoID,
+                    DeviceTypeID:   v.DeviceTypeID,
+                    ManufacturerID: v.ManufacturerID,
+                    SerialNumber:   v.SerialNumber,
+                    Status:         string(v.Status),
+                })
+            }
+        }
+        helpers.JsonResponseSuccess(w, http.StatusOK, e)
+        return
+    }
 }
 
 // GetEquipmentBySN get equipment by serial number
@@ -182,7 +176,7 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 		DeviceTypeID:   d.DeviceTypeID,
 		ManufacturerID: d.ManufacturerID,
 		SerialNumber:   d.SerialNumber,
-        Status:        string(d.Status),
+		Status:         string(d.Status),
 	}
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
@@ -1263,7 +1257,7 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
 }
 
-// UpdateEquipmentStauy update equipment status
+// UpdateEquipmentStatus update equipment status
 //
 //	@Summary		update equipment status
 //	@Description	update equipment status in the database
@@ -1347,7 +1341,7 @@ func (h *EquipmentHandler) UpdateEquipmentStatus(w http.ResponseWriter, r *http.
 //	@Produce		json
 //	@Param			sn				query		string	true	"serial number"
 //	@Param			manufacturer	query		int		true	"manufacturer id"	minimum(1)
-//	@Param			device		    query		int		true	"device id"			minimum(1)
+//	@Param			device			query		int		true	"device id"			minimum(1)
 //	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400				{object}	models.JsonResponse
 //	@Failure		500				{object}	models.JsonResponse
