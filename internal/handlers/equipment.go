@@ -23,8 +23,8 @@ func (h *EquipmentHandler) BadEndpointHandler(w http.ResponseWriter, r *http.Req
 
 // GetEquipments get all equipment
 //
-//	@Summary		get all equipments with limit and offset
-//	@Description	get all equipment with limit and offset facturers from the database
+//	@Summary		get all equipments with
+//	@Description	get all equipment with manufacturers from the database
 //	@Tags			equipment
 //	@Accept			json
 //	@Produce		json
@@ -35,12 +35,12 @@ func (h *EquipmentHandler) BadEndpointHandler(w http.ResponseWriter, r *http.Req
 func (h *EquipmentHandler) GetEquipments(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment")
 		return
 	}
 	d, err := q.GetAllEquipment(r.Context())
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment")
 		return
 	}
 
@@ -115,7 +115,7 @@ func (h *EquipmentHandler) GetEquipmentBySN(w http.ResponseWriter, r *http.Reque
 
 	d, err := q.GetEquipmentBySerialNumber(r.Context(), sn)
 	if err == sql.ErrNoRows {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "GET /api/v1/equipment?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exist in database", "GET /api/v1/equipment")
 		return
 	} else if err != nil {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment/sn/{sn}")
@@ -190,8 +190,6 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 //	@Accept			json
 //	@Produce		json
 //	@Param			sn		path		string	true	"serial number"
-//	@Param			limit	query		int		true	"limit"		minimum(1)
-//	@Param			offset	query		int		true	"offset"	minimum(1)
 //	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400		{object}	models.JsonResponse
 //	@Failure		500		{object}	models.JsonResponse
@@ -199,42 +197,21 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
 	sn := r.PathValue("sn")
 	if sn == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing serial number", "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
-		return
-	}
-
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
-		return
-	}
 	sn = "%" + sn + "%"
 
-	d, err := q.GetEquipmentLikeSerialNumber(r.Context(), sqlc.GetEquipmentLikeSerialNumberParams{SerialNumber: sn, Limit: int32(l), Offset: int32(o)})
+	d, err := q.GetEquipmentLikeSerialNumber(r.Context(), sn)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment "+err.Error(), "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment "+err.Error(), "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
@@ -249,7 +226,7 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 		})
 	}
 	if e == nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/sn-like/{sn}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
@@ -264,8 +241,6 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int	true	"manufacturer id"	minimum(1)
-//	@Param			limit	query		int	true	"limit"				minimum(1)
-//	@Param			offset	query		int	true	"offset"			minimum(1)
 //	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400		{object}	models.JsonResponse
 //	@Failure		500		{object}	models.JsonResponse
@@ -273,18 +248,18 @@ func (h *EquipmentHandler) GetEquipmentLikeSN(w http.ResponseWriter, r *http.Req
 func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/manufacturer/{id}")
 		return
 	}
 
 	manufacturerID := r.PathValue("id")
 	if manufacturerID == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/equipment/manufacturer/{id}")
 		return
 	}
 	id, err := strconv.Atoi(manufacturerID)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/equipment/manufacturer/{id}")
 		return
 	}
 
@@ -307,31 +282,10 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 		return
 	}
 
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit missing", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
-		return
-	}
 
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
+	d, err := q.GetEquipmentByManufacturer(r.Context(), int32(id))
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	d, err := q.GetEquipmentByManufacturer(r.Context(), sqlc.GetEquipmentByManufacturerParams{ManufacturerID: int32(id), Limit: int32(l), Offset: int32(o)})
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment", "GET /api/v1/equipment/manufacturer/{id}")
 		return
 	}
 
@@ -347,7 +301,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 	}
 
 	if e == nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/manufacturer/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/manufacturer/{id}")
 		return
 	}
 
@@ -362,8 +316,6 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int	true	"device id"	minimum(1)
-//	@Param			limit	query		int	true	"limit"		minimum(1)
-//	@Param			offset	query		int	true	"offset"	minimum(1)
 //	@Success		200		{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400		{object}	models.JsonResponse
 //	@Failure		500		{object}	models.JsonResponse
@@ -371,18 +323,18 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerID(w http.ResponseWriter, r
 func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/device/{id}")
 		return
 	}
 
 	deviceID := r.PathValue("id")
 	if deviceID == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "GET /api/v1/equipment/device/{id}")
 		return
 	}
 	id, err := strconv.Atoi(deviceID)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/equipment/device/{id}")
 		return
 	}
 
@@ -405,31 +357,9 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 		return
 	}
 
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
+	d, err := q.GetEquipmentByDeviceType(r.Context(), int32(id))
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	d, err := q.GetEquipmentByDeviceType(r.Context(), sqlc.GetEquipmentByDeviceTypeParams{DeviceTypeID: int32(id), Limit: int32(l), Offset: int32(o)})
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/device/{id}")
 		return
 	}
 
@@ -445,7 +375,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 	}
 
 	if e == nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{id}")
 		return
 	}
 
@@ -461,8 +391,6 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 //	@Produce		json
 //	@Param			device_id		path		int	true	"device id"			minimum(1)
 //	@Param			manufacturer_id	path		int	true	"manufacturer id"	minimum(1)
-//	@Param			limit			query		int	true	"limit"				minimum(1)
-//	@Param			offset			query		int	true	"offset"			minimum(1)
 //	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400				{object}	models.JsonResponse
 //	@Failure		500				{object}	models.JsonResponse
@@ -470,18 +398,18 @@ func (h *EquipmentHandler) GetEquipmentByDeviceID(w http.ResponseWriter, r *http
 func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 
 	deviceID := r.PathValue("device_id")
 	if deviceID == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 	did, err := strconv.Atoi(deviceID)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "device id is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 
@@ -506,12 +434,12 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 
 	manufacturerID := r.PathValue("manufacturer_id")
 	if manufacturerID == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing manufacturer id", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 	mid, err := strconv.Atoi(manufacturerID)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + manufacturerID)
@@ -531,34 +459,12 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
 		return
 	}
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	d, err := q.GetEquipmentByDeviceTypeAndManufacturer(r.Context(), sqlc.GetEquipmentByDeviceTypeAndManufacturerParams{DeviceTypeID: int32(did), ManufacturerID: int32(mid), Limit: int32(l), Offset: int32(o)})
+	d, err := q.GetEquipmentByDeviceTypeAndManufacturer(r.Context(), sqlc.GetEquipmentByDeviceTypeAndManufacturerParams{DeviceTypeID: int32(did), ManufacturerID: int32(mid)})
 	if err != nil && err != sql.ErrNoRows {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "failed to query database for equipment"+err.Error(), "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	} else if err == sql.ErrNoRows {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 
@@ -574,7 +480,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndManufacturerID(w http.Respon
 	}
 
 	if e == nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}")
 		return
 	}
 
@@ -622,7 +528,7 @@ func (h *EquipmentHandler) GetEquipmentByDeviceIDAndSN(w http.ResponseWriter, r 
 	}
 
 	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
@@ -714,7 +620,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndSN(w http.ResponseWrit
 	}
 
 	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
@@ -805,7 +711,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 	}
 
 	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}")
 		return
 	}
 
@@ -872,10 +778,10 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 	})
 
 	if err == sql.ErrNoRows {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment")
 		return
 	} else if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment")
 		return
 	}
 
@@ -892,8 +798,6 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 //	@Param			manufacturer_id	path		int		true	"manufacturer id"	minimum(1)
 //	@Param			device_id		path		int		true	"device id"			minimum(1)
 //	@Param			sn				path		string	true	"serial number"
-//	@Param			limit			query		int		true	"limit"		minimum(1)
-//	@Param			offset			query		int		true	"offset"	minimum(2)
 //	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400				{object}	models.JsonResponse
 //	@Failure		500				{object}	models.JsonResponse
@@ -967,27 +871,6 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/device")
 		return
 	}
-	limit := r.FormValue("limit")
-	offset := r.FormValue("offset")
-	if limit == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing limit", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-	l, err := strconv.Atoi(limit)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "limit is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-
-	if offset == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing offset", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
-	o, err := strconv.Atoi(offset)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "offset is not a number", "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}?limit={limit}&offset={offset}")
-		return
-	}
 
 	sn = "%" + sn + "%"
 
@@ -995,15 +878,13 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
 		SerialNumber:   sn,
 		DeviceTypeID:   int32(did),
 		ManufacturerID: int32(mid),
-		Limit:          int32(l),
-		Offset:         int32(o),
 	})
 
 	if err == sql.ErrNoRows {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment does not exists", "GET /api/v1/equipment")
 		return
 	} else if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with query "+err.Error(), "GET /api/v1/equipment")
 		return
 	}
 
@@ -1019,7 +900,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
 	}
 
 	if e == nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment")
 		return
 	}
 
