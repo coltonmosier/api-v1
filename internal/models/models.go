@@ -26,7 +26,7 @@ type Equipment struct {
 	DeviceTypeID   int32  `json:"device_type_id" example:"1"`        // DeviceTypeID is an int32 for device id
 	ManufacturerID int32  `json:"manufacturer_id" example:"1"`       // ManufacturerID is an int32 for manufacturer id
 	SerialNumber   string `json:"serial_number" example:"SN-123456"` // SerialNumber is a string for equipment serial number
-	Status         string `json:"status" example:"active|inactive"`
+	Status         string `json:"status" example:"active|inactive"` // Status is a string for equipment status either active or inactive
 }
 
 // Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment

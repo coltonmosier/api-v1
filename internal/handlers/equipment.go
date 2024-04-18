@@ -896,8 +896,8 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDAndSN(w http.R
 //	@Param			manufacturer_id	path		int		true	"manufacturer id"	minimum(1)
 //	@Param			device_id		path		int		true	"device id"			minimum(1)
 //	@Param			sn				path		string	true	"serial number"
-//	@Param			limit			query		int	true	"limit"				minimum(1)
-//	@Param			offset			query		int	true	"offset"			minimum(1)
+//	@Param			limit			query		int		true	"limit"		minimum(1)
+//	@Param			offset			query		int		true	"offset"	minimum(1)
 //	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400				{object}	models.JsonResponse
 //	@Failure		500				{object}	models.JsonResponse

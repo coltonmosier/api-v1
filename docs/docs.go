@@ -950,6 +950,94 @@ const docTemplate = `{
                 }
             }
         },
+        "/equipment/sn-like/{sn}/manufacturer/{manufacturer_id}/device/{device_id}": {
+            "get": {
+                "description": "get equipment by manufacturer id like serial number and device id from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "equipment"
+                ],
+                "summary": "get equipment by manufacturer id like serial number and device id",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "manufacturer id",
+                        "name": "manufacturer_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "device id",
+                        "name": "device_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "serial number",
+                        "name": "sn",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JsonResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "MSG": {
+                                            "$ref": "#/definitions/models.Equipment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/equipment/sn/{sn}/device/{device_id}": {
             "get": {
                 "description": "get equipment by device id and serial number from the database",
@@ -1513,6 +1601,11 @@ const docTemplate = `{
                     "description": "SerialNumber is a string for equipment serial number",
                     "type": "string",
                     "example": "SN-123456"
+                },
+                "status": {
+                    "description": "Status is a string for equipment status either active or inactive",
+                    "type": "string",
+                    "example": "active|inactive"
                 }
             }
         },

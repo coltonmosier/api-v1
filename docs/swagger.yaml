@@ -35,6 +35,10 @@ definitions:
         description: SerialNumber is a string for equipment serial number
         example: SN-123456
         type: string
+      status:
+        description: Status is a string for equipment status either active or inactive
+        example: active|inactive
+        type: string
     type: object
   models.JsonResponse:
     description: JsonResponse is a struct for response JSON message
@@ -708,6 +712,65 @@ paths:
           schema:
             $ref: '#/definitions/models.JsonResponse'
       summary: get equipment like serial number
+      tags:
+      - equipment
+  /equipment/sn-like/{sn}/manufacturer/{manufacturer_id}/device/{device_id}:
+    get:
+      consumes:
+      - application/json
+      description: get equipment by manufacturer id like serial number and device
+        id from the database
+      parameters:
+      - description: manufacturer id
+        in: path
+        minimum: 1
+        name: manufacturer_id
+        required: true
+        type: integer
+      - description: device id
+        in: path
+        minimum: 1
+        name: device_id
+        required: true
+        type: integer
+      - description: serial number
+        in: path
+        name: sn
+        required: true
+        type: string
+      - description: limit
+        in: query
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: offset
+        in: query
+        minimum: 1
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JsonResponse'
+            - properties:
+                MSG:
+                  $ref: '#/definitions/models.Equipment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.JsonResponse'
+      summary: get equipment by manufacturer id like serial number and device id
       tags:
       - equipment
   /equipment/sn/{sn}/device/{device_id}:
