@@ -1606,17 +1606,17 @@
             "description": "JsonResponse is a struct for response JSON message",
             "type": "object",
             "properties": {
-                "Action": {
-                    "description": "Action is a string for response action",
-                    "type": "string"
-                },
-                "MSG": {
-                    "description": "Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment"
-                },
                 "Status": {
                     "description": "Status is a string for response status",
                     "type": "string",
                     "example": "SUCCESS|ERROR"
+                },
+                "MSG": {
+                    "description": "Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment"
+                },
+                "Action": {
+                    "description": "Action is a string for response action",
+                    "type": "string"
                 }
             }
         },
