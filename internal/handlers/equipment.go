@@ -1000,7 +1000,7 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
     }
 
     if e == nil {
-        helpers.JsonResponseError(w, http.StatusNotFound, "no equipment found", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
+        helpers.JsonResponseError(w, http.StatusBadRequest, "no equipment found", "GET /api/v1/equipment/limit/{limit}/offset/{offset}")
         return
     }
 
