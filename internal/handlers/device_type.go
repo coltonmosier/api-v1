@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/coltonmosier/api-v1/internal/database"
 	"github.com/coltonmosier/api-v1/internal/helpers"
@@ -313,7 +314,7 @@ func (h *DeviceHandler) CreateDeviceType(w http.ResponseWriter, r *http.Request)
     }
 
     for _, v := range device {
-        if v.Name == name {
+        if strings.ToLower(v.Name) == strings.ToLower(name) {
             helpers.JsonResponseError(w, http.StatusBadRequest, "device type already exists", "POST /api/v1/device?name={newName}")
             return
         }

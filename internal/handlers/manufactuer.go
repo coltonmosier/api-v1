@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/coltonmosier/api-v1/internal/database"
 	"github.com/coltonmosier/api-v1/internal/helpers"
@@ -316,7 +317,7 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 	}
 
 	for _, v := range manufacturer {
-		if v.Name == name {
+		if strings.ToLower(v.Name) == strings.ToLower(name) {
 			helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer type already exists", "POST /api/v1/manufacturer?name={newName}")
 			return
 		}
