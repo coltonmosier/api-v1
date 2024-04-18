@@ -915,25 +915,6 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
 		return
 	}
 
-	resp, err := http.Get("http://localhost:8081/api/v1/equipment/" + sn)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/equipment/"+sn, "GET /api/v1/equipment/{sn}")
-		return
-	}
-	defer resp.Body.Close()
-
-	var req models.JsonResponse
-	err = json.NewDecoder(resp.Body).Decode(&req)
-	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/equipment", "GET /api/v1/equipment/{sn}")
-		return
-	}
-
-	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/equipment/sn-like/{sn}/limit/{limit}/offset/{offset}")
-		return
-	}
-
 	manufacturerID := r.PathValue("manufacturer_id")
 
 	mid, err := strconv.Atoi(manufacturerID)
@@ -942,13 +923,14 @@ func (h *EquipmentHandler) GetEquipmentByManufacturerIDAndDeviceIDLikeSN(w http.
 		return
 	}
 
-	resp, err = http.Get("http://localhost:8081/api/v1/manufacturer/" + manufacturerID)
+    resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + manufacturerID)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+manufacturerID, "GET /api/v1/manufacturer/{id}")
 		return
 	}
 	defer resp.Body.Close()
 
+	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "GET /api/v1/manufacturer/{id}")
