@@ -182,6 +182,7 @@ func (h *EquipmentHandler) GetEquipmentByID(w http.ResponseWriter, r *http.Reque
 		DeviceTypeID:   d.DeviceTypeID,
 		ManufacturerID: d.ManufacturerID,
 		SerialNumber:   d.SerialNumber,
+        Status:        string(d.Status),
 	}
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
@@ -1262,7 +1263,7 @@ func (h *EquipmentHandler) UpdateEquipment(w http.ResponseWriter, r *http.Reques
 	helpers.JsonResponseSuccess(w, http.StatusOK, "equipment updated")
 }
 
-// UpdateEquipmentStaus update equipment status
+// UpdateEquipmentStauy update equipment status
 //
 //	@Summary		update equipment status
 //	@Description	update equipment status in the database
@@ -1345,8 +1346,8 @@ func (h *EquipmentHandler) UpdateEquipmentStatus(w http.ResponseWriter, r *http.
 //	@Accept			json
 //	@Produce		json
 //	@Param			sn				query		string	true	"serial number"
-//	@Param			manufacturer_id	query		int		true	"manufacturer id"	minimum(1)
-//	@Param			device_id		query		int		true	"device id"			minimum(1)
+//	@Param			manufacturer	query		int		true	"manufacturer id"	minimum(1)
+//	@Param			device		    query		int		true	"device id"			minimum(1)
 //	@Success		200				{object}	models.JsonResponse{MSG=models.Equipment}
 //	@Failure		400				{object}	models.JsonResponse
 //	@Failure		500				{object}	models.JsonResponse
@@ -1381,9 +1382,9 @@ func (h *EquipmentHandler) CreateEquipment(w http.ResponseWriter, r *http.Reques
 		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
 		return
 	} else if req.Message != "equipment does not exist in database" {
-        log.Println("req.Message: ", req.Message)
-        helpers.JsonResponseError(w, http.StatusBadRequest, "equipment already exists in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
-        return
+		log.Println("req.Message: ", req.Message)
+		helpers.JsonResponseError(w, http.StatusBadRequest, "equipment already exists in database", "POST /api/v1/equipment?sn={sn}&_id={device_id}&manufacturer_id={manufacturer_id}")
+		return
 	}
 
 	did := r.FormValue("device")
