@@ -29,6 +29,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
         start := time.Now()
 		w.Header().Add("Content-Type", "application/json")
         w.Header().Add("Access-Control-Allow-Origin", "*")
+        w.Header().Add("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
 		wr := &wrappedWriter{w, http.StatusOK}
 		next.ServeHTTP(wr, r)
 
