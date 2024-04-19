@@ -31,11 +31,11 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
 		wr := &wrappedWriter{w, http.StatusOK}
-		next.ServeHTTP(wr, r)
 		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
+			wr.WriteHeader(http.StatusOK)
 			return
 		}
+		next.ServeHTTP(wr, r)
 		ip := strings.Split(r.Header.Get("X-Real-IP"), ":")[0]
 		if ip == "" {
 			ip = strings.Split(r.RemoteAddr, ":")[0]
