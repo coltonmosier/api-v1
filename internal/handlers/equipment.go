@@ -1157,7 +1157,7 @@ func (h *EquipmentHandler) UpdateEquipmentStatus(w http.ResponseWriter, r *http.
 		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/equipment/{id}/status?status={status}")
 		return
 	}
-	id := r.FormValue("id")
+	id := r.PathValue("id")
 	if id == "" {
 		helpers.JsonResponseError(w, http.StatusBadRequest, "missing id", "PATCH /api/v1/equipment/{id}/status?status={status}")
 		return
