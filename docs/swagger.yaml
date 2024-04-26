@@ -13,7 +13,7 @@ definitions:
         type: string
       status:
         description: Status is a string for device type status either active or inactive
-        example: active|inactive
+        example: active
         type: string
     type: object
   models.Equipment:
@@ -37,7 +37,7 @@ definitions:
         type: string
       status:
         description: Status is a string for equipment status either active or inactive
-        example: active|inactive
+        example: active
         type: string
     type: object
   models.JsonResponse:
@@ -45,13 +45,14 @@ definitions:
     properties:
       Action:
         description: Action is a string for response action
+        example: none
         type: string
       MSG:
         description: Message is an interface for response message can be string, models.DeviceType,
           models.Manufacturer, models.Equipment
       Status:
         description: Status is a string for response status
-        example: SUCCESS|ERROR
+        example: SUCCESS
         type: string
     type: object
   models.Manufacturer:
@@ -67,7 +68,7 @@ definitions:
         type: string
       status:
         description: Status is a string for manufacturer status either active or inactive
-        example: active|inactive
+        example: active
         type: string
     type: object
 info:
@@ -92,7 +93,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.DeviceType'
+                  items:
+                    $ref: '#/definitions/models.DeviceType'
+                  type: array
               type: object
         "500":
           description: Internal Server Error
@@ -246,9 +249,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: get all equipment with limit and offset facturers from the database
+      description: get all equipment with manufacturers from the database
       parameters:
-      - description: active and inactive
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
         name: all
         required: true
@@ -263,13 +267,15 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.JsonResponse'
-      summary: get all equipments with limit and offset
+      summary: get all equipments with
       tags:
       - equipment
     patch:
@@ -424,18 +430,12 @@ paths:
         name: manufacturer_id
         required: true
         type: integer
-      - description: limit
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
-        minimum: 1
-        name: limit
+        name: all
         required: true
-        type: integer
-      - description: offset
-        in: query
-        minimum: 1
-        name: offset
-        required: true
-        type: integer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -446,7 +446,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "400":
           description: Bad Request
@@ -471,18 +473,12 @@ paths:
         name: id
         required: true
         type: integer
-      - description: limit
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
-        minimum: 1
-        name: limit
+        name: all
         required: true
-        type: integer
-      - description: offset
-        in: query
-        minimum: 1
-        name: offset
-        required: true
-        type: integer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -493,7 +489,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "400":
           description: Bad Request
@@ -553,18 +551,12 @@ paths:
         name: id
         required: true
         type: integer
-      - description: limit
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
-        minimum: 1
-        name: limit
+        name: all
         required: true
-        type: integer
-      - description: offset
-        in: query
-        minimum: 1
-        name: offset
-        required: true
-        type: integer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -575,7 +567,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "400":
           description: Bad Request
@@ -672,18 +666,12 @@ paths:
         name: sn
         required: true
         type: string
-      - description: limit
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
-        minimum: 1
-        name: limit
+        name: all
         required: true
-        type: integer
-      - description: offset
-        in: query
-        minimum: 1
-        name: offset
-        required: true
-        type: integer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -694,7 +682,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "400":
           description: Bad Request
@@ -731,18 +721,12 @@ paths:
         name: sn
         required: true
         type: string
-      - description: limit
+      - description: set to true to get all equipment, otherwise only active equipment
+          is returned
         in: query
-        minimum: 1
-        name: limit
+        name: all
         required: true
-        type: integer
-      - description: offset
-        in: query
-        minimum: 2
-        name: offset
-        required: true
-        type: integer
+        type: boolean
       produces:
       - application/json
       responses:
@@ -753,7 +737,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Equipment'
+                  items:
+                    $ref: '#/definitions/models.Equipment'
+                  type: array
               type: object
         "400":
           description: Bad Request
@@ -908,7 +894,9 @@ paths:
             - $ref: '#/definitions/models.JsonResponse'
             - properties:
                 MSG:
-                  $ref: '#/definitions/models.Manufacturer'
+                  items:
+                    $ref: '#/definitions/models.Manufacturer'
+                  type: array
               type: object
         "500":
           description: Internal Server Error

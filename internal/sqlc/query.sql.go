@@ -604,14 +604,14 @@ func (q *Queries) UpdateDeviceTypeStatus(ctx context.Context, arg UpdateDeviceTy
 
 const updateEquipment = `-- name: UpdateEquipment :exec
 UPDATE serial_numbers SET device_type_id = ?, manufacturer_id = ?, serial_number = ?
-WHERE serial_number = ?
+WHERE auto_id = ?
 `
 
 type UpdateEquipmentParams struct {
 	DeviceTypeID   int32
 	ManufacturerID int32
 	SerialNumber   string
-	SerialNumber_2 string
+	AutoID         int32
 }
 
 func (q *Queries) UpdateEquipment(ctx context.Context, arg UpdateEquipmentParams) error {
@@ -619,7 +619,7 @@ func (q *Queries) UpdateEquipment(ctx context.Context, arg UpdateEquipmentParams
 		arg.DeviceTypeID,
 		arg.ManufacturerID,
 		arg.SerialNumber,
-		arg.SerialNumber_2,
+		arg.AutoID,
 	)
 	return err
 }

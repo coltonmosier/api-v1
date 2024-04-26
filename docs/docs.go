@@ -41,7 +41,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.DeviceType"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.DeviceType"
+                                            }
                                         }
                                     }
                                 }
@@ -52,6 +55,13 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/device"
+                            }
                         }
                     }
                 },
@@ -83,18 +93,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "deivce created with name of {name}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device type name already exists",
+                                "Action": "POST /api/v1/device?name={newName}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "failed to create device",
+                                "Action": "POST /api/v1/device?name={newName}"
+                            }
                         }
                     }
                 },
@@ -147,12 +178,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device id is not a number",
+                                "Action": "GET /api/v1/device/{id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/device/{id}"
+                            }
                         }
                     }
                 },
@@ -194,18 +239,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "device type {id} updated with a nof of {newName}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device name is missing",
+                                "Action": "PATCH /api/v1/device/{id}/name?name={newName}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "something went wrong + sql.Err()",
+                                "Action": "PATCH /api/v1/device/{id}/name?name={newName}"
+                            }
                         }
                     }
                 },
@@ -251,18 +317,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "device type {id} updated with status of {newStatus}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "status must be either active or inactive",
+                                "Action": "PATCH /api/v1/device/{id}/status?status={newStatus}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "something went wrong + sql.Err()",
+                                "Action": "PATCH /api/v1/device/{id}/status?status={newStatus}"
+                            }
                         }
                     }
                 },
@@ -271,7 +358,7 @@ const docTemplate = `{
         },
         "/equipment": {
             "get": {
-                "description": "get all equipment with limit and offset facturers from the database",
+                "description": "get all equipment with manufacturers from the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -281,11 +368,11 @@ const docTemplate = `{
                 "tags": [
                     "equipment"
                 ],
-                "summary": "get all equipments with limit and offset",
+                "summary": "get all equipments with",
                 "parameters": [
                     {
                         "type": "boolean",
-                        "description": "active and inactive",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
                         "name": "all",
                         "in": "query",
                         "required": true
@@ -303,7 +390,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -314,6 +404,13 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment?all=true"
+                            }
                         }
                     }
                 }
@@ -359,31 +456,40 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
                                     "$ref": "#/definitions/models.JsonResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
-                                        }
-                                    }
-                                }
-                            ]
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "equipment created",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "cannot create, manufacturer is inactive",
+                                "Action": "GET /api/v1/manufacturer/{id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "failed to decode response from /api/v1/manufacturer",
+                                "Action": "GET /api/v1/manufacturer/{id}"
+                            }
                         }
                     }
                 }
@@ -437,31 +543,40 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.JsonResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
-                                        }
-                                    }
-                                }
-                            ]
+                                "$ref": "#/definitions/models.JsonResponse"
+                            },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "equipment updated",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "id is not a number",
+                                "Action": "PATCH /api/v1/equipment?id={id}&sn={sn}&manufacturer_id={manufacturer_id}&device_id={device_id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "PATCH /api/v1/equipment?id={id}&sn={sn}&manufacturer_id={manufacturer_id}&device_id={device_id}"
+                            }
                         }
                     }
                 }
@@ -498,18 +613,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -526,7 +632,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -537,12 +646,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device id is not a number",
+                                "Action": "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/device/{device_id}/manufacturer/{manufacturer_id}"
+                            }
                         }
                     }
                 }
@@ -571,18 +694,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -599,7 +713,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -610,12 +727,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device type does not exist",
+                                "Action": "GET /api/v1/equipment/device/{device_id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/device/{device_id}"
+                            }
                         }
                     }
                 }
@@ -667,12 +798,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "id is not a number",
+                                "Action": "GET /api/v1/equipment/id?id={id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/id?id={id}"
+                            }
                         }
                     }
                 }
@@ -701,18 +846,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -729,7 +865,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -740,12 +879,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "manufacturer does not exist",
+                                "Action": "GET /api/v1/manufacturer"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/manufacturer/{id}?all=true"
+                            }
                         }
                     }
                 }
@@ -796,12 +949,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "serial number must start with SN-",
+                                "Action": "GET /api/v1/equipment/sn?sn={sn}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn?sn={sn}"
+                            }
                         }
                     }
                 }
@@ -839,31 +1006,40 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.JsonResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "serial number updated",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "serial number does not exist",
+                                "Action": "GET /api/v1/equipment/sn-like/{sn}?all=true"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "PATCH /api/v1/equipment/sn?sn={newsn}&id={id}"
+                            }
                         }
                     }
                 }
@@ -891,18 +1067,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -919,7 +1086,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -930,12 +1100,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "no equipment found",
+                                "Action": "GET /api/v1/equipment/sn-like/{sn}?all=true"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn-like/{sn}?all=true"
+                            }
                         }
                     }
                 }
@@ -979,18 +1163,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 2,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -1007,7 +1182,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -1018,12 +1196,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device id does not exist",
+                                "Action": "GET /api/v1/device"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn-like/{sn}/manufacturer/{manufacturer_id}/device/{device_id}?all=true"
+                            }
                         }
                     }
                 }
@@ -1082,12 +1274,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "equipment does not exist",
+                                "Action": "GET /api/v1/equipment"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn/{sn}/device/{device_id}"
+                            }
                         }
                     }
                 }
@@ -1146,12 +1352,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "manufacturer id is not a number",
+                                "Action": "GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}"
+                            }
                         }
                     }
                 }
@@ -1218,12 +1438,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "device id is not a number",
+                                "Action": "GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/equipment/sn/{sn}/manufacturer/{manufacturer_id}/device/{device_id}"
+                            }
                         }
                     }
                 }
@@ -1268,18 +1502,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "equipment status updated to {newStatus}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "status must be either active or inactive",
+                                "Action": "PATCH /api/v1/equipment/{id}/status?status={status}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "PATCH /api/v1/equipment/{id}/status?status={status}"
+                            }
                         }
                     }
                 }
@@ -1310,7 +1565,10 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Manufacturer"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Manufacturer"
+                                            }
                                         }
                                     }
                                 }
@@ -1321,6 +1579,13 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/manufacturer"
+                            }
                         }
                     }
                 }
@@ -1351,18 +1616,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "manufacturer created with name of {name}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "manufacturer type already exists",
+                                "Action": "GET /api/v1/manufacturer"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "POST /api/v1/manufacturer?name={name}"
+                            }
                         }
                     }
                 },
@@ -1415,12 +1701,26 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "id is not a number",
+                                "Action": "GET /api/v1/manufacturer/{id}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "GET /api/v1/manufacturer/{id}"
+                            }
                         }
                     }
                 }
@@ -1461,18 +1761,39 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "manufacturer with id: {id} updated name to {name}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "name cannot be empty",
+                                "Action": "PATCH /api/v1/manufacturer/{id}/name?name={name}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "could not connect to database",
+                                "Action": "PATCH /api/v1/manufacturer/{id}/name?name={name}"
+                            }
                         }
                     }
                 }
@@ -1516,31 +1837,40 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.JsonResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "MSG": {
-                                            "$ref": "#/definitions/models.Manufacturer"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "SUCCESS",
+                                "MSG": "manufacturer with id: {id} updated status to {status}",
+                                "Action": "none"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "status must be either active or inactive",
+                                "Action": "PATCH /api/v1/manufacturer/{id}/status?status={status}"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.JsonResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "Status": "ERROR",
+                                "MSG": "cannot connect to database",
+                                "Action": "PATCH /api/v1/manufacturer/{id}/status?status={status}"
+                            }
                         }
                     }
                 }
@@ -1565,7 +1895,7 @@ const docTemplate = `{
                 "status": {
                     "description": "Status is a string for device type status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         },
@@ -1591,12 +1921,12 @@ const docTemplate = `{
                 "serial_number": {
                     "description": "SerialNumber is a string for equipment serial number",
                     "type": "string",
-                    "example": "SN-123456"
+                    "example": "SN-0123456abcdef"
                 },
                 "status": {
                     "description": "Status is a string for equipment status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         },
@@ -1604,17 +1934,18 @@ const docTemplate = `{
             "description": "JsonResponse is a struct for response JSON message",
             "type": "object",
             "properties": {
-                "Action": {
-                    "description": "Action is a string for response action",
-                    "type": "string"
+                "Status": {
+                    "description": "Status is a string for response status",
+                    "type": "string",
+                    "example": "SUCCESS"
                 },
                 "MSG": {
                     "description": "Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment"
                 },
-                "Status": {
-                    "description": "Status is a string for response status",
+                "Action": {
+                    "description": "Action is a string for response action",
                     "type": "string",
-                    "example": "SUCCESS|ERROR"
+                    "example": "none"
                 }
             }
         },
@@ -1635,7 +1966,7 @@ const docTemplate = `{
                 "status": {
                     "description": "Status is a string for manufacturer status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         }

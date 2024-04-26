@@ -7,7 +7,7 @@ type DeviceType struct {
 	// Name is a string for device type name
 	Name string `json:"name" example:"computer"`
 	// Status is a string for device type status either active or inactive
-	Status string `json:"status" example:"active|inactive"`
+	Status string `json:"status" example:"active"`
 }
 
 // @description Manufacturer is a struct for manufacturer
@@ -17,7 +17,7 @@ type Manufacturer struct {
 	// Name is a string for manufacturer name
 	Name string `json:"name"    example:"Apple"`
 	// Status is a string for manufacturer status either active or inactive
-	Status string `json:"status"  example:"active|inactive"`
+	Status string `json:"status"  example:"active"`
 }
 
 // @description Equipment is a struct for equipment
@@ -26,7 +26,7 @@ type Equipment struct {
 	DeviceTypeID   int32  `json:"device_type_id" example:"1"`        // DeviceTypeID is an int32 for device id
 	ManufacturerID int32  `json:"manufacturer_id" example:"1"`       // ManufacturerID is an int32 for manufacturer id
 	SerialNumber   string `json:"serial_number" example:"SN-123456"` // SerialNumber is a string for equipment serial number
-	Status         string `json:"status" example:"active|inactive"` // Status is a string for equipment status either active or inactive
+	Status         string `json:"status" example:"active"` // Status is a string for equipment status either active or inactive
 }
 
 // Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment
@@ -35,9 +35,9 @@ type Message interface{}
 // @description JsonResponse is a struct for response JSON message
 type JsonResponse struct {
 	// Status is a string for response status
-	Status string `json:"Status" example:"SUCCESS|ERROR"`
+	Status string `json:"Status" example:"SUCCESS"`
 	// Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment
 	Message Message `json:"MSG"`
 	// Action is a string for response action
-	Action string `json:"Action"`
+    Action string `json:"Action" example:"none"`
 }

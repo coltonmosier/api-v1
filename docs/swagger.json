@@ -34,7 +34,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.DeviceType"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.DeviceType"
+                                            }
                                         }
                                     }
                                 }
@@ -264,7 +267,7 @@
         },
         "/equipment": {
             "get": {
-                "description": "get all equipment with limit and offset facturers from the database",
+                "description": "get all equipment with manufacturers from the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -274,11 +277,11 @@
                 "tags": [
                     "equipment"
                 ],
-                "summary": "get all equipments with limit and offset",
+                "summary": "get all equipments with",
                 "parameters": [
                     {
                         "type": "boolean",
-                        "description": "active and inactive",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
                         "name": "all",
                         "in": "query",
                         "required": true
@@ -296,7 +299,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -491,18 +497,9 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -519,7 +516,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -564,18 +564,9 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -592,7 +583,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -694,18 +688,9 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -722,7 +707,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -884,18 +872,9 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -912,7 +891,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -972,18 +954,9 @@
                         "required": true
                     },
                     {
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "minimum": 2,
-                        "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "type": "boolean",
+                        "description": "set to true to get all equipment, otherwise only active equipment is returned",
+                        "name": "all",
                         "in": "query",
                         "required": true
                     }
@@ -1000,7 +973,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Equipment"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Equipment"
+                                            }
                                         }
                                     }
                                 }
@@ -1303,7 +1279,10 @@
                                     "type": "object",
                                     "properties": {
                                         "MSG": {
-                                            "$ref": "#/definitions/models.Manufacturer"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Manufacturer"
+                                            }
                                         }
                                     }
                                 }
@@ -1558,7 +1537,7 @@
                 "status": {
                     "description": "Status is a string for device type status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         },
@@ -1589,7 +1568,7 @@
                 "status": {
                     "description": "Status is a string for equipment status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         },
@@ -1599,7 +1578,8 @@
             "properties": {
                 "Action": {
                     "description": "Action is a string for response action",
-                    "type": "string"
+                    "type": "string",
+                    "example": "none"
                 },
                 "MSG": {
                     "description": "Message is an interface for response message can be string, models.DeviceType, models.Manufacturer, models.Equipment"
@@ -1607,7 +1587,7 @@
                 "Status": {
                     "description": "Status is a string for response status",
                     "type": "string",
-                    "example": "SUCCESS|ERROR"
+                    "example": "SUCCESS"
                 }
             }
         },
@@ -1628,7 +1608,7 @@
                 "status": {
                     "description": "Status is a string for manufacturer status either active or inactive",
                     "type": "string",
-                    "example": "active|inactive"
+                    "example": "active"
                 }
             }
         }

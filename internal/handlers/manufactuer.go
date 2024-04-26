@@ -22,7 +22,7 @@ type ManufactuerHandler struct{}
 //	@Tags			manufacturer
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	models.JsonResponse{MSG=models.Manufacturer}
+//	@Success		200	{object}	models.JsonResponse{MSG=[]models.Manufacturer}
 //	@Failure		500	{object}	models.JsonResponse
 //	@Router			/manufacturer [get]
 func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +34,7 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 	}
 	d, err := q.GetManufacturersActive(r.Context())
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "something went wrong with query"+err.Error(), "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "something went wrong with query "+err.Error(), "GET /api/v1/manufacturer")
 		return
 	}
 	for _, v := range d {
@@ -63,7 +63,7 @@ func (h *ManufactuerHandler) GetManufacturers(w http.ResponseWriter, r *http.Req
 func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "GET /api/v1/manufacturer/{id}")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 
 	i, err := strconv.Atoi(id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "manufacturer id is not a number", "GET /api/v1/manufacturer/{id}")
 		return
 	}
 
@@ -109,12 +109,12 @@ func (h *ManufactuerHandler) GetManufacturerByID(w http.ResponseWriter, r *http.
 func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/manufacturer/{id}?name={newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/manufacturer/{id}?name={newName}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 
@@ -126,7 +126,7 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 
 	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}?name={newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 	defer resp.Body.Close()
@@ -134,24 +134,24 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/manufacturer/{id}?name={newName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer"+id, "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 
 	if req.Status == "ERROR" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "GET /api/v1/manufacturer")
+		helpers.JsonResponseError(w, http.StatusBadRequest, req.Message, "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 
 	name := r.FormValue("name")
 	if name == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "name cannot be empty", "none")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "name cannot be empty", "PATH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 
 	err = q.UpdateManufacturer(r.Context(), sqlc.UpdateManufacturerParams{ID: int32(i), Name: name})
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement "+err.Error(), "PATCH /api/v1/manufacturer/{id}/name?name={newName}")
 		return
 	}
 
@@ -176,12 +176,12 @@ func (h *ManufactuerHandler) UpdateManufacturerName(w http.ResponseWriter, r *ht
 func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *http.Request) {
 	q, err := database.InitEquipmentDatabase()
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/manufacturer/{id}?status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "could not connect to database", "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	}
 	id := r.PathValue("id")
 	if id == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/manufacturer/{id}?status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "missing device id", "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	}
 
@@ -193,7 +193,7 @@ func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *
 
 	resp, err := http.Get("http://localhost:8081/api/v1/manufacturer/" + id)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}?status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to get response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	}
 	defer resp.Body.Close()
@@ -201,7 +201,7 @@ func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *
 	var req models.JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&req)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer", "PATCH /api/v1/manufacturer/{id}?status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to decode response from /api/v1/manufacturer/"+id, "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	}
 
@@ -212,22 +212,22 @@ func (h *ManufactuerHandler) UpdateManufacturerStatus(w http.ResponseWriter, r *
 
 	status := r.FormValue("status")
 	if status == "" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "status cannot be empty", "none")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status cannot be empty", "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	}
 	if status != "active" && status != "inactive" {
-		helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either active or inactive", "PATCH /api/v1/manufacturer/{id}?status={newStatus}")
+		helpers.JsonResponseError(w, http.StatusBadRequest, "status must be either active or inactive", "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 		return
 	} else if status == "active" {
 		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusActive})
 		if err != nil {
-			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}")
+			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement "+err.Error(), "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 			return
 		}
 	} else { // status must be inactive here
 		err = q.UpdateManufacturerStatus(r.Context(), sqlc.UpdateManufacturerStatusParams{ID: int32(i), Status: sqlc.ManufacturerStatusInactive})
 		if err != nil {
-			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement"+err.Error(), "PATCH /api/v1/manufacturer/{id}?name={newName}")
+			helpers.JsonResponseError(w, http.StatusBadRequest, "something went wrong with sql statement "+err.Error(), "PATCH /api/v1/manufacturer/{id}/status?status={newStatus}")
 			return
 		}
 	}
@@ -286,11 +286,11 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 		if m, ok := v.(map[string]interface{}); ok {
 			// Extract values from the map and create a Manufacturer instance
 			var d models.Manufacturer
-			if id, ok := m["id"].(float64); ok {
+			if id, ok := m["id"].(int); ok {
 				d.ID = int32(id)
 			} else {
 				// Handle error when id cannot be converted to float64
-				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert id to float64", "POST /api/v1/manufacturer?name={newName}")
+				helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to convert id to int", "POST /api/v1/manufacturer?name={newName}")
 				return
 			}
 			if name, ok := m["name"].(string); ok {
@@ -324,7 +324,7 @@ func (h *ManufactuerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 	}
 	err = q.CreateManufacturer(r.Context(), name)
 	if err != nil {
-		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new manufacturer to database"+err.Error(), "POST /api/v1/manufacturer/{newManufacturerName}")
+		helpers.JsonResponseError(w, http.StatusInternalServerError, "failed to write new manufacturer to database "+err.Error(), "POST /api/v1/manufacturer?name={newName}")
 		return
 	}
 
