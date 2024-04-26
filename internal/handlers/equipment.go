@@ -126,6 +126,7 @@ func (h *EquipmentHandler) GetEquipmentBySN(w http.ResponseWriter, r *http.Reque
 		DeviceTypeID:   d.DeviceTypeID,
 		ManufacturerID: d.ManufacturerID,
 		SerialNumber:   d.SerialNumber,
+        Status:        string(d.Status),
 	}
 
 	helpers.JsonResponseSuccess(w, http.StatusOK, e)
